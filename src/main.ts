@@ -28,7 +28,7 @@ loadConfig()
     const el = document.getElementById("app");
     if (el) {
       el.textContent = `서버(${
-        backendHost || "VUE_APP_BACKEND_HOST 미설정"
+        backendHost || "백엔드 주소 미설정"
       })에서 설정을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.`;
     }
   });

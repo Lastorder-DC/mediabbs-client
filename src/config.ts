@@ -46,8 +46,18 @@ export interface PublicConfig {
   };
 }
 
+declare global {
+  interface Window {
+    /** Set by public/config.js (runtime, deploy-time settings). */
+    MEDIABBS_CONFIG?: { backendHost?: string };
+  }
+}
+
+/** Backend URL: runtime config.js first, then VUE_APP_BACKEND_HOST (build time). */
 export const backendHost: string = (
-  process.env.VUE_APP_BACKEND_HOST || ""
+  window.MEDIABBS_CONFIG?.backendHost ||
+  process.env.VUE_APP_BACKEND_HOST ||
+  ""
 ).replace(/\/+$/, "");
 
 // Reactive so templates update if the config object is replaced.

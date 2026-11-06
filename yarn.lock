@@ -8485,53 +8485,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"librebbs-client@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "librebbs-client@workspace:."
-  dependencies:
-    "@toast-ui/vue-editor": "npm:^2.5.3"
-    "@types/luxon": "npm:^1.27.1"
-    "@types/md5": "npm:^2.3.1"
-    "@typescript-eslint/eslint-plugin": "npm:^4.28.5"
-    "@typescript-eslint/parser": "npm:^4.28.5"
-    "@vue/cli-plugin-babel": "npm:~4.5.0"
-    "@vue/cli-plugin-eslint": "npm:~4.5.0"
-    "@vue/cli-plugin-pwa": "npm:~4.5.0"
-    "@vue/cli-plugin-router": "npm:~4.5.0"
-    "@vue/cli-plugin-typescript": "npm:~4.5.0"
-    "@vue/cli-plugin-vuex": "npm:~4.5.0"
-    "@vue/cli-service": "npm:~4.5.0"
-    "@vue/eslint-config-prettier": "npm:^6.0.0"
-    "@vue/eslint-config-typescript": "npm:^7.0.0"
-    axios: "npm:^0.21.1"
-    buefy: "npm:^0.9.8"
-    bulma: "npm:^0.9.3"
-    core-js: "npm:^3.6.5"
-    eslint: "npm:^7.32.0"
-    eslint-plugin-prettier: "npm:^3.4.0"
-    eslint-plugin-vue: "npm:^7.15.0"
-    html-entities: "npm:^2.3.2"
-    luxon: "npm:^2.0.1"
-    navigator.locks: "npm:^0.3.1"
-    prettier: "npm:^2.3.2"
-    pug: "npm:^3.0.2"
-    pug-plain-loader: "npm:^1.1.0"
-    register-service-worker: "npm:^1.7.2"
-    sass: "npm:~1.32.13"
-    sass-loader: "npm:^10.1.1"
-    typescript: "npm:~4.3.5"
-    vue: "npm:^2.6.14"
-    vue-class-component: "npm:^7.2.6"
-    vue-gravatar: "npm:^1.4.1"
-    vue-infinite-loading: "npm:^2.4.5"
-    vue-meta: "npm:^2.4.0"
-    vue-property-decorator: "npm:^9.1.2"
-    vue-router: "npm:^3.5.2"
-    vue-template-compiler: "npm:^2.6.14"
-    vuex: "npm:^3.6.2"
-  languageName: unknown
-  linkType: soft
-
 "lines-and-columns@npm:^1.1.6":
   version: 1.2.4
   resolution: "lines-and-columns@npm:1.2.4"
@@ -8873,6 +8826,53 @@ __metadata:
   checksum: 10c0/d160f31246907e79fed398470285f21bafb45a62869dc469b1c8877f3f064f5eabc4bcc122f9479b8b605bc5c76187d7871cf84c4ee3ecd3e487da1993279928
   languageName: node
   linkType: hard
+
+"mediabbs-client@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "mediabbs-client@workspace:."
+  dependencies:
+    "@toast-ui/vue-editor": "npm:^2.5.3"
+    "@types/luxon": "npm:^1.27.1"
+    "@types/md5": "npm:^2.3.1"
+    "@typescript-eslint/eslint-plugin": "npm:^4.28.5"
+    "@typescript-eslint/parser": "npm:^4.28.5"
+    "@vue/cli-plugin-babel": "npm:~4.5.0"
+    "@vue/cli-plugin-eslint": "npm:~4.5.0"
+    "@vue/cli-plugin-pwa": "npm:~4.5.0"
+    "@vue/cli-plugin-router": "npm:~4.5.0"
+    "@vue/cli-plugin-typescript": "npm:~4.5.0"
+    "@vue/cli-plugin-vuex": "npm:~4.5.0"
+    "@vue/cli-service": "npm:~4.5.0"
+    "@vue/eslint-config-prettier": "npm:^6.0.0"
+    "@vue/eslint-config-typescript": "npm:^7.0.0"
+    axios: "npm:^0.21.1"
+    buefy: "npm:^0.9.8"
+    bulma: "npm:^0.9.3"
+    core-js: "npm:^3.6.5"
+    eslint: "npm:^7.32.0"
+    eslint-plugin-prettier: "npm:^3.4.0"
+    eslint-plugin-vue: "npm:^7.15.0"
+    html-entities: "npm:^2.3.2"
+    luxon: "npm:^2.0.1"
+    navigator.locks: "npm:^0.3.1"
+    prettier: "npm:^2.3.2"
+    pug: "npm:^3.0.2"
+    pug-plain-loader: "npm:^1.1.0"
+    register-service-worker: "npm:^1.7.2"
+    sass: "npm:~1.32.13"
+    sass-loader: "npm:^10.1.1"
+    typescript: "npm:~4.3.5"
+    vue: "npm:^2.6.14"
+    vue-class-component: "npm:^7.2.6"
+    vue-gravatar: "npm:^1.4.1"
+    vue-infinite-loading: "npm:^2.4.5"
+    vue-meta: "npm:^2.4.0"
+    vue-property-decorator: "npm:^9.1.2"
+    vue-router: "npm:^3.5.2"
+    vue-template-compiler: "npm:^2.6.14"
+    vuex: "npm:^3.6.2"
+  languageName: unknown
+  linkType: soft
 
 "memfs@npm:^3.1.2":
   version: 3.5.3

@@ -1,7 +1,9 @@
 @import "~bulma/sass/utilities/_all";
 
 // Set your colors
-$primary: #4188f1;
+// $primary can be overridden at build time with VUE_APP_PRIMARY_COLOR
+// (see vue.config.js).
+$primary: #4188f1 !default;
 $primary-invert: findColorInvert($primary);
 // Links
 $link: #337ab7;
@@ -14,7 +16,7 @@ $navbar-height: 2.8rem;
 $navbar-background-color: $primary;
 $navbar-item-color: $white;
 $navbar-item-hover-color: $white;
-$navbar-item-hover-background-color: #71a5f4;
+$navbar-item-hover-background-color: lighten($primary, 10%);
 $navbar-item-active-color: $white;
 $newlink-color: #b73333;
 

@@ -1,41 +1,53 @@
-name: Build and Deploy
+name: Build
 
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
-  deploy:
-    name: Build and Deploy
+  build:
+    name: Lint and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "yarn"
 
-      - run: yarn
+      - run: yarn install --immutable
 
-      - run: |
-          echo "$(env | grep VUE_APP_CLIENT_ID)" > .env.local
-          echo "$(env | grep VUE_APP_BACKEND_HOST)" >> .env.local
-        env:
-          VUE_APP_CLIENT_ID: ${{ secrets.VUE_APP_CLIENT_ID }}
-          VUE_APP_BACKEND_HOST: ${{ secrets.VUE_APP_BACKEND_HOST }}
+      - run: yarn lint --no-fix
 
       - run: |
           yarn build
           cp dist/index.html dist/404.html
+        env:
+          # Optional: bake the backend URL into the build. It can also be set
+          # after deployment by editing config.js.
+          VUE_APP_BACKEND_HOST: ${{ vars.BACKEND_HOST }}
+          VUE_APP_PRIMARY_COLOR: ${{ vars.PRIMARY_COLOR }}
+          VUE_APP_SITE_NAME: ${{ vars.SITE_NAME }}
 
-      - uses: JamesIves/github-pages-deploy-action@4.1.0
+      - name: Write runtime config.js
+        if: ${{ vars.BACKEND_HOST != '' }}
+        run: |
+          printf 'window.MEDIABBS_CONFIG = { backendHost: "%s" };\n' "${{ vars.BACKEND_HOST }}" > dist/config.js
+
+      # GitHub Pages deployment is opt-in: set the repository variable
+      # DEPLOY_GH_PAGES=true (and optionally PAGES_CNAME=bbs.example.org).
+      - name: Add CNAME
+        if: ${{ github.event_name == 'push' && vars.DEPLOY_GH_PAGES == 'true' && vars.PAGES_CNAME != '' }}
+        run: echo "${{ vars.PAGES_CNAME }}" > dist/CNAME
+
+      - name: Deploy to GitHub Pages
+        if: ${{ github.event_name == 'push' && vars.DEPLOY_GH_PAGES == 'true' }}
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: dist # The folder the action should deploy.
+          branch: gh-pages
+          folder: dist
           clean: false
           single-commit: false
-          token: ${{ github.token }}
-          git-config-name: "github-actions[bot]"
-          git-config-email: "41898282+github-actions[bot]@users.noreply.github.com"

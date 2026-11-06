@@ -90,7 +90,7 @@ import type { Board } from "@/api";
 import { getConfig } from "@/config";
 import type { NavLink } from "@/config";
 import { searchUrl, specialUrl, userUrl, wikiApi } from "@/wiki";
-import defaultLogo from "@/assets/logo.png";
+import defaultLogo from "@/assets/logo.svg";
 
 interface PrefixSearchResponse {
   query?: {
@@ -205,6 +205,9 @@ export default class NavBar extends Vue {
 
 <style lang="scss">
 @import "@/assets/style-variables.scss";
+.navbar-start > a.navbar-item:first-child img {
+  margin-right: 0.4rem;
+}
 .liberty-navbar {
   top: 0;
   z-index: 18 !important;

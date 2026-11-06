@@ -1,17 +1,29 @@
 <template lang="pug">
 footer.liberty-footer.main-footer
-  a(href="https://librewiki.net")
-    img.designedbylibre(src="../assets/designedbylibre.png")
-  .librebbs 
-    a(
-      href="https://librewiki.net/wiki/%EB%A6%AC%EB%B8%8C%EB%A0%88_%EC%9C%84%ED%82%A4:LibreBBS"
-    ) Powered by LibreBBS
+  a.footer-wiki(:href="wikiHome") {{ wikiName }}
+  .mediabbs
+    a(href="https://github.com/Lastorder-DC/mediabbs") Powered by MediaBBS
+    |
+    | (based on
+    |
+    a(href="https://github.com/librewiki/librebbs") LibreBBS
+    | )
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
+import { getConfig } from "@/config";
 
-export default class FooterContent extends Vue {}
+@Component
+export default class FooterContent extends Vue {
+  get wikiHome(): string {
+    return getConfig().wiki.baseUrl;
+  }
+
+  get wikiName(): string {
+    return getConfig().wiki.siteName || getConfig().wiki.baseUrl;
+  }
+}
 </script>
 
 <style lang="scss">
@@ -28,12 +40,8 @@ export default class FooterContent extends Vue {}
   border-bottom-right-radius: $radius-large;
   background-color: $background;
 }
-.designedbylibre {
-  width: 100px;
-  height: auto;
-}
-
-.librebbs {
+.mediabbs {
   float: right;
+  font-size: 0.9rem;
 }
 </style>

@@ -1,6 +1,6 @@
 {
-  "name": "librebbs-client",
-  "version": "0.1.4",
+  "name": "mediabbs-client",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
