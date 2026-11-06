@@ -6,11 +6,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
 import { Viewer } from "@toast-ui/vue-editor";
+import { getConfig } from "@/config";
+import { absoluteWikiHref, wikiApi } from "@/wiki";
 
 interface SiteNoticeResponse {
-  parse: SiteNoticeitem;
+  parse?: SiteNoticeitem;
 }
 
 interface SiteNoticeitem {
@@ -37,26 +38,29 @@ export default class SiteNotice extends Vue {
 
   async fetchSiteNotice(): Promise<void> {
     try {
-      const { data } = await axios.get<SiteNoticeResponse>(
-        "https://librewiki.net/api.php",
-        {
-          params: {
-            action: "parse",
-            origin: window.origin,
-            page: "mediawiki:sitenotice",
-            prop: "text",
-            formatversion: "2",
-            format: "json",
-          },
-        }
-      );
+      const { enabled, page } = getConfig().siteNotice;
+      if (!enabled) {
+        return;
+      }
+      const data = await wikiApi<SiteNoticeResponse>({
+        action: "parse",
+        page,
+        prop: "text",
+      });
+      if (!data.parse) {
+        // The page does not exist (the API returns an error object instead).
+        return;
+      }
       this.item = data.parse;
       this.done = true;
       await this.$nextTick();
+      if (!this.$refs.viewer) {
+        return;
+      }
       for (const link of this.$refs.viewer.$el.querySelectorAll("a")) {
         const href = link.attributes.getNamedItem("href");
-        if (href?.value.startsWith("/")) {
-          href.value = `https://librewiki.net${href.value}`;
+        if (href) {
+          href.value = absoluteWikiHref(href.value);
         }
       }
       return;

@@ -1,23 +1,25 @@
 import axios from "axios";
+import { backendHost, getConfig } from "@/config";
 
 function startLoginProcess(state: string): void {
-  const client_id = process.env.VUE_APP_CLIENT_ID;
-  const href =
-    "https://librewiki.net/rest.php/oauth2/authorize" +
-    `?response_type=code&client_id=${client_id}` +
-    `&state=${encodeURIComponent(state)}`;
-  location.replace(href);
+  const { oauth } = getConfig();
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: oauth.clientId,
+    state,
+  });
+  location.replace(`${oauth.authorizeUrl}?${params.toString()}`);
 }
 
 async function logout(): Promise<void> {
-  await axios.post(`${process.env.VUE_APP_BACKEND_HOST}/auth/logout`, null, {
+  await axios.post(`${backendHost}/auth/logout`, null, {
     withCredentials: true,
   });
 }
 
 async function getToken(code: string): Promise<void> {
   await axios.post(
-    `${process.env.VUE_APP_BACKEND_HOST}/auth/login`,
+    `${backendHost}/auth/login`,
     { code },
     {
       withCredentials: true,
@@ -34,13 +36,9 @@ async function refreshToken(): Promise<void> {
     async (lock) => {
       try {
         if (lock) {
-          await axios.post(
-            `${process.env.VUE_APP_BACKEND_HOST}/auth/refresh`,
-            null,
-            {
-              withCredentials: true,
-            }
-          );
+          await axios.post(`${backendHost}/auth/refresh`, null, {
+            withCredentials: true,
+          });
         } else {
           await navigator.locks.request("refresh", () => null); // wait first refresh request done
         }

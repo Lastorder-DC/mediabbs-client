@@ -10,6 +10,7 @@ interface State {
     error: Error | null;
   };
   board: Board;
+  boards: Board[] | null;
   user: {
     isInitialized: boolean;
     isLoggedIn: boolean;
@@ -39,6 +40,7 @@ const storeOptions: StoreOptions<State> = {
       createdAt: "",
       updatedAt: "",
     },
+    boards: null,
     user: {
       isInitialized: false,
       isLoggedIn: false,
@@ -57,6 +59,9 @@ const storeOptions: StoreOptions<State> = {
   mutations: {
     setBoard(state, board: Board) {
       state.board = board;
+    },
+    setBoards(state, boards: Board[]) {
+      state.boards = boards;
     },
     setError(state, error: Error) {
       state.meta.error = error;
@@ -95,7 +100,7 @@ const storeOptions: StoreOptions<State> = {
         store.commit("updateUserInfo", {
           isInitialized: true,
           isLoggedIn: true,
-          isAdmin: data.groups.includes("boardmanager"),
+          isAdmin: data.isAdmin,
           isBlocked: data.blocked,
           email: data.email,
           username: data.username,
@@ -104,8 +109,14 @@ const storeOptions: StoreOptions<State> = {
         store.commit("resetUserInfo");
       }
     },
+    async fetchBoards(): Promise<Board[]> {
+      if (!store.state.boards) {
+        store.commit("setBoards", await getBoards());
+      }
+      return store.state.boards as Board[];
+    },
     async fetchBoard(state, boardName: string) {
-      const boards = await getBoards();
+      const boards: Board[] = await store.dispatch("fetchBoards");
       const board = boards.find((x) => x.name === boardName);
       if (board) {
         store.commit("setBoard", board);

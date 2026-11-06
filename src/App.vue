@@ -34,6 +34,8 @@ import ErrorModal from "@/components/ErrorModal.vue";
 import FooterContent from "@/components/FooterContent.vue";
 import SiteNotice from "@/components/SiteNotice.vue";
 import Tools from "@/components/Tools.vue";
+import type { MetaInfo } from "vue-meta";
+import { boardSiteName } from "@/config";
 
 @Component({
   components: {
@@ -44,6 +46,14 @@ import Tools from "@/components/Tools.vue";
     FooterContent,
     SiteNotice,
     Tools,
+  },
+  metaInfo(): MetaInfo {
+    const siteName = boardSiteName();
+    return {
+      title: siteName,
+      titleTemplate: (title?: string) =>
+        title && title !== siteName ? `${title} - ${siteName}` : siteName,
+    };
   },
 })
 export default class App extends Vue {

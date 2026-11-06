@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { LockManager } from "navigator.locks";
 import { refreshToken } from "@/auth";
+import { backendHost } from "@/config";
 
 declare global {
   interface Navigator {
@@ -9,7 +10,7 @@ declare global {
 }
 
 const client = axios.create({
-  baseURL: process.env.VUE_APP_BACKEND_HOST,
+  baseURL: backendHost,
   withCredentials: true,
 });
 
@@ -37,6 +38,7 @@ interface UserInfo {
   groups: string[];
   rights: string[];
   username: string;
+  isAdmin: boolean;
 }
 
 async function getUserInfo(): Promise<UserInfo> {
@@ -224,6 +226,7 @@ async function unhideComment(commentId: number): Promise<Comment> {
 
 interface FileResponse {
   path: string;
+  url: string;
 }
 
 async function postFile(

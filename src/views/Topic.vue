@@ -32,6 +32,7 @@
   hr
   p(v-if="topic.isClosed") 이 주제는 종료되어 의견을 추가할 수 없습니다.
   p(v-else-if="topic.isSuspended") 이 주제는 잠겨있어 의견을 추가할 수 없습니다.
+  p(v-else-if="!board.isActive") 이 게시판은 보관 중이어서 의견을 추가할 수 없습니다.
   p(v-else-if="user.isBlocked") 차단되어 있어 의견을 추가할 수 없습니다.
   new-comment(:topic-id="topic.id", :refresh="refresh", v-else)
 </template>
@@ -154,6 +155,7 @@ export default class TopicPage extends Vue {
       tp.isClosed == true ||
       tp.isSuspended == true ||
       tp.isHidden == true ||
+      !store.state.board.isActive ||
       store.state.user.isBlocked == true
     ) {
       store.commit("setCanWrite", false);

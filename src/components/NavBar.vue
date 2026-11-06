@@ -3,55 +3,46 @@ nav.liberty-navbar.navbar
   .container
     .navbar-menu.is-active
       .navbar-start
-        a.navbar-item(active-class="", href="https://librewiki.net")
-          img(alt="Logo", src="../assets/logo.png")
-          | {{ settings.data.wikiName }}
-        a.navbar-item(
-          href=`https://librewiki.net/wiki/${encodeURIComponent('특수:최근바뀜')}`
-        )
+        a.navbar-item(active-class="", :href="wikiHome")
+          img(alt="Logo", :src="logo", @error="logoFailed = true")
+          | {{ wikiName }}
+        a.navbar-item(:href="special('RecentChanges')")
           b-icon(icon="sync")
           span.navbar-text 최근 바뀜
-        a.navbar-item(
-          href=`https://librewiki.net/wiki/${encodeURIComponent('특수:임의문서')}`
-        )
+        a.navbar-item(:href="special('Random')")
           b-icon(icon="random")
           span.navbar-text 임의 문서
-        a.navbar-item(href="https://maps.librewiki.net")
-          b-icon(icon="map")
-          span.navbar-text 맵스
-        b-dropdown
+        b-dropdown(v-if="boards.length")
           a.navbar-item(slot="trigger")
             b-icon(icon="comments")
             span.navbar-text 게시판
             b-icon.navbar-caret(icon="caret-down")
-          b-dropdown-item(has-link)
-            router-link(to="/wiki") 위키방
-          b-dropdown-item(has-link)
-            router-link(to="/freeboard") 자유게시판
+          b-dropdown-item(has-link, v-for="b in boards", :key="b.id")
+            router-link(:to="`/${b.name}`") {{ b.displayName }}
         b-dropdown
           a.navbar-item(slot="trigger")
             b-icon(icon="wrench")
             span.navbar-text 도구
             b-icon.navbar-caret(icon="caret-down")
-          b-dropdown-item(has-link, v-if="user.isAdmin")
-            router-link(to="/admin") 관리자 도구
           b-dropdown-item(has-link)
-            a(
-              :href="`https://librewiki.net/wiki/${encodeURIComponent('특수:올리기')}`"
-            ) 파일 업로드
-        b-dropdown
-          a.navbar-item(slot="trigger")
-            b-icon(icon="question")
-            span.navbar-text 도움말
-            b-icon.navbar-caret(icon="caret-down")
+            a(:href="special('Upload')") 파일 업로드
           b-dropdown-item(has-link)
-            a(
-              :href="`https://librewiki.net/wiki/${encodeURIComponent('도움말:문법 도움말')}`"
-            ) 문법 도움말
-          b-dropdown-item(has-link)
-            a(
-              :href="`https://librewiki.net/wiki/${encodeURIComponent('도움말:Tex 문법')}`"
-            ) TeX 문법
+            a(:href="special('SpecialPages')") 특수 문서 목록
+        template(v-for="(link, i) in navLinks")
+          b-dropdown(v-if="link.children && link.children.length", :key="`nav-${i}`")
+            a.navbar-item(slot="trigger")
+              b-icon(v-if="link.icon", :icon="link.icon")
+              span.navbar-text {{ link.label }}
+              b-icon.navbar-caret(icon="caret-down")
+            b-dropdown-item(
+              has-link,
+              v-for="(child, j) in link.children",
+              :key="`nav-${i}-${j}`"
+            )
+              a(:href="child.url") {{ child.label }}
+          a.navbar-item(v-else, :key="`nav-${i}`", :href="link.url")
+            b-icon(v-if="link.icon", :icon="link.icon")
+            span.navbar-text {{ link.label }}
       .user-items(v-if="user.isInitialized")
         a.navbar-item(v-if="!user.isLoggedIn", @click="login")
           b-icon(pack="fa", icon="sign-in")
@@ -60,14 +51,10 @@ nav.liberty-navbar.navbar
             a.navbar-item.user-gravatar-wrapper(slot="trigger")
               gravatar.user-gravatar(:email="user.email")
             b-dropdown-item(has-link)
-              a(
-                :href="`https://librewiki.net/wiki/${encodeURIComponent('사용자:' + user.username)}`"
-              ) 사용자:{{ user.username }}
+              a(:href="userPage(user.username)") {{ user.username }}
             hr.dropdown-divider
             b-dropdown-item(has-link)
-              a(
-                :href="`https://librewiki.net/wiki/${encodeURIComponent('특수:환경설정')}`"
-              ) 환경설정
+              a(:href="special('Preferences')") 환경설정
             hr.dropdown-divider
             b-dropdown-item(has-link)
               a.navbar-item(@click="logout") 로그아웃
@@ -83,7 +70,7 @@ nav.liberty-navbar.navbar
               :data="autoCompleteItem",
               @keyup.enter.native="go",
               @select="(option) => (selected = option)",
-              @input="getMedaiwikiSearch(searchInput)",
+              @input="onSearchInput",
               max-height="100%"
             )
             p.control
@@ -99,30 +86,16 @@ import { Component, Vue } from "vue-property-decorator";
 import Gravatar from "vue-gravatar";
 import { startLoginProcess, logout } from "@/auth";
 import store from "@/store";
-import axios from "axios";
+import type { Board } from "@/api";
+import { getConfig } from "@/config";
+import type { NavLink } from "@/config";
+import { searchUrl, specialUrl, userUrl, wikiApi } from "@/wiki";
+import defaultLogo from "@/assets/logo.png";
 
-interface AutoCompleteResponse {
-  batchcomplete: string;
-  continue: {
-    sroffset: number;
-    continue: string;
+interface PrefixSearchResponse {
+  query?: {
+    prefixsearch: { ns: number; title: string; pageid: number }[];
   };
-  query: {
-    searchinfo: {
-      totalhits: number;
-    };
-    search: AutoCompleteResponseItem[];
-  };
-}
-
-interface AutoCompleteResponseItem {
-  ns: number;
-  title: string;
-  pageid: number;
-  size: number;
-  wordcount: number;
-  snippet: string;
-  timestamp: string;
 }
 
 @Component({
@@ -132,15 +105,47 @@ interface AutoCompleteResponseItem {
 })
 export default class NavBar extends Vue {
   searchInput = "";
-  settings = {
-    data: {
-      wikiname: "리브레 위키",
-    },
-  };
-  autoCompleteItem = [""];
+  selected: string | null = null;
+  autoCompleteItem: string[] = [];
+  searchTimer: number | undefined = undefined;
+  searchSeq = 0;
+  logoFailed = false;
 
   get user(): typeof store.state.user {
     return store.state.user;
+  }
+
+  get boards(): Board[] {
+    return store.state.boards || [];
+  }
+
+  get wikiName(): string {
+    return getConfig().wiki.siteName || "Wiki";
+  }
+
+  get wikiHome(): string {
+    return getConfig().wiki.baseUrl;
+  }
+
+  get logo(): string {
+    // Fall back to the bundled logo if the wiki has none or it fails to load.
+    return (!this.logoFailed && getConfig().wiki.logo) || defaultLogo;
+  }
+
+  get navLinks(): NavLink[] {
+    return getConfig().navLinks;
+  }
+
+  special(page: string): string {
+    return specialUrl(page);
+  }
+
+  userPage(name: string): string {
+    return userUrl(name);
+  }
+
+  mounted(): void {
+    store.dispatch("fetchBoards").catch((err) => console.log(err));
   }
 
   async login(): Promise<void> {
@@ -154,40 +159,43 @@ export default class NavBar extends Vue {
 
   go(): void {
     if (this.searchInput) {
-      location.href = `https://librewiki.net/index.php?title=special:search&search=${encodeURIComponent(
-        this.searchInput
-      )}`;
+      location.href = searchUrl(this.searchInput);
     }
   }
 
   search(): void {
     if (this.searchInput) {
-      location.href = `https://librewiki.net/index.php?title=special:search&search=${encodeURIComponent(
-        this.searchInput
-      )}&fulltext=search`;
+      location.href = searchUrl(this.searchInput, true);
     }
   }
 
-  async getMedaiwikiSearch(key: string): Promise<void> {
-    try {
-      const { data } = await axios.get<AutoCompleteResponse>(
-        "https://librewiki.net/api.php",
-        {
-          params: {
-            action: "query",
-            list: "search",
-            origin: window.origin,
-            format: "json",
-            srsearch: key,
-            srlimit: 10,
-          },
-        }
-      );
+  onSearchInput(): void {
+    window.clearTimeout(this.searchTimer);
+    this.searchTimer = window.setTimeout(
+      () => this.fetchSuggestions(this.searchInput),
+      200
+    );
+  }
+
+  async fetchSuggestions(key: string): Promise<void> {
+    const seq = ++this.searchSeq;
+    if (!key.trim()) {
       this.autoCompleteItem = [];
-      data.query.search.forEach((item) =>
-        this.autoCompleteItem.push(item.title)
-      );
       return;
+    }
+    try {
+      const data = await wikiApi<PrefixSearchResponse>({
+        action: "query",
+        list: "prefixsearch",
+        pssearch: key,
+        pslimit: 10,
+      });
+      // Ignore responses that arrive after a newer request was sent.
+      if (seq === this.searchSeq) {
+        this.autoCompleteItem = (data.query?.prefixsearch || []).map(
+          (item) => item.title
+        );
+      }
     } catch (err) {
       console.log(err);
     }

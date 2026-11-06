@@ -1,5 +1,5 @@
 <template lang="pug">
-nav.panel.live-recent
+nav.panel.live-recent(v-if="enabled")
   .live-recent-header
     .tabs.is-toggle.is-fullwidth
       ul
@@ -26,18 +26,15 @@ nav.panel.live-recent
       span.live-recent-tag(v-if="item.isNew") [New]
       span.live-recent-title {{ item.text }}
   .live-recent-footer.panel-block
-    a.button.is-primary.is-small(
-      href=`https://librewiki.net/wiki/${encodeURIComponent('특수:최근바뀜')}`
-    ) 더보기
+    a.button.is-primary.is-small(:href="moreUrl") 더보기
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
 import { DateTime } from "luxon";
+import { getConfig } from "@/config";
+import { specialUrl, wikiApi, wikiUrl } from "@/wiki";
 
-const documentNamespaces = "0|4|10|12|14|1600";
-const topicNamespaces = "1|3|5|7|9|11|13|15|2600|1601|1063|3604|3605";
 const limit = 10;
 
 interface RecentChangeResponse {
@@ -67,29 +64,41 @@ export default class LiveRecent extends Vue {
   items: RecentChangeItem[] = [];
   mode = "DOCUMENT";
 
+  get enabled(): boolean {
+    return getConfig().recentChanges.enabled;
+  }
+
+  get moreUrl(): string {
+    return specialUrl("RecentChanges");
+  }
+
+  get namespaces(): string {
+    const rc = getConfig().recentChanges;
+    const list =
+      this.mode === "DOCUMENT"
+        ? rc.documentNamespaces
+        : rc.discussionNamespaces;
+    if (list && list.length) {
+      return list.join("|");
+    }
+    return this.mode === "DOCUMENT" ? "0" : "1|3";
+  }
+
   async fetchLiveRecent(): Promise<void> {
-    if (window.innerWidth < 769) return;
+    if (!this.enabled || window.innerWidth < 769) return;
     if (this.pending) return;
     this.pending = true;
     try {
-      const { data } = await axios.get<RecentChangeResponse>(
-        "https://librewiki.net/api.php",
-        {
-          params: {
-            action: "query",
-            origin: window.origin,
-            list: "recentchanges",
-            rcprop: "title|timestamp",
-            rcshow: "!bot|!redirect",
-            rctype: "edit|new",
-            rclimit: limit,
-            format: "json",
-            rcnamespace:
-              this.mode === "DOCUMENT" ? documentNamespaces : topicNamespaces,
-            rctoponly: true,
-          },
-        }
-      );
+      const data = await wikiApi<RecentChangeResponse>({
+        action: "query",
+        list: "recentchanges",
+        rcprop: "title|timestamp",
+        rcshow: "!bot|!redirect",
+        rctype: "edit|new",
+        rclimit: limit,
+        rcnamespace: this.namespaces,
+        rctoponly: true,
+      });
       this.items = data.query.recentchanges.map(
         (item: RecentChangeResponseItem) => {
           let timeString: string;
@@ -105,7 +114,7 @@ export default class LiveRecent extends Vue {
             timeString,
             isNew,
             text: item.title,
-            to: `https://librewiki.net/wiki/${encodeURIComponent(item.title)}`,
+            to: wikiUrl(item.title),
           };
         }
       );

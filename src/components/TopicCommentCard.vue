@@ -2,21 +2,13 @@
 .card.topic-comment-card
   header.card-header
     .topic-comment-info
-      a(
-        :href="`https://librewiki.net/wiki/${encodeURIComponent('사용자:' + comment.authorName)}`"
-      )
+      a(:href="userUrl(comment.authorName)")
         .topic-comment-author {{ comment.authorName }}
       span.comment-author-link
         | (
-        a(
-          @click.stop,
-          :href="`https://librewiki.net/wiki/${encodeURIComponent('사용자토론:' + comment.authorName)}`"
-        ) 토론
+        a(@click.stop, :href="userTalkUrl(comment.authorName)") 토론
         | |
-        a(
-          @click.stop,
-          :href="`https://librewiki.net/wiki/${encodeURIComponent('특수:기여/' + comment.authorName)}`"
-        ) 기여
+        a(@click.stop, :href="contributionsUrl(comment.authorName)") 기여
         | )
     .topic-comment-tools
       .topic-comment-date {{ dateString }}
@@ -31,8 +23,9 @@
             b-dropdown-item.comment-tool-button(@click="showHidden") 내용 보기
           b-dropdown-item.comment-tool-button(@click="hide", v-else) 숨기기
           b-dropdown-item.comment-tool-button(
-            :href="`https://librewiki.net/wiki/${encodeURIComponent('특수:차단/' + comment.authorName)}`"
-          ) 사용자 차단
+            has-link
+          )
+            a(:href="blockUrl(comment.authorName)") 사용자 차단
 
   .card-comment(:class="{ 'hidden-comment': comment.isHidden }")
     viewer(:initialValue="comment.content", v-if="comment.content")
@@ -47,6 +40,7 @@ import store from "@/store";
 import "@toast-ui/editor/dist/toastui-editor-viewer.css";
 import { Viewer } from "@toast-ui/vue-editor";
 import { DateTime } from "luxon";
+import { blockUrl, contributionsUrl, userTalkUrl, userUrl } from "@/wiki";
 
 @Component({
   components: {
@@ -55,6 +49,10 @@ import { DateTime } from "luxon";
 })
 export default class TopicContentCard extends Vue {
   @Prop() comment!: Comment;
+  userUrl = userUrl;
+  userTalkUrl = userTalkUrl;
+  contributionsUrl = contributionsUrl;
+  blockUrl = blockUrl;
 
   get user(): typeof store.state.user {
     return store.state.user;

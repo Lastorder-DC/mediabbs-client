@@ -7,21 +7,12 @@
           .topic-card-header
             .topic-author-area
               span.topic-author
-                a(
-                  @click.stop,
-                  :href="`https://librewiki.net/wiki/${encodeURIComponent('사용자:' + topic.authorName)}`"
-                ) {{ topic.authorName }}
+                a(@click.stop, :href="userUrl(topic.authorName)") {{ topic.authorName }}
                 span.topic-author-link
                   | (
-                  a(
-                    @click.stop,
-                    :href="`https://librewiki.net/wiki/${encodeURIComponent('사용자토론:' + topic.authorName)}`"
-                  ) 토론
+                  a(@click.stop, :href="userTalkUrl(topic.authorName)") 토론
                   | |
-                  a(
-                    @click.stop,
-                    :href="`https://librewiki.net/wiki/${encodeURIComponent('특수:기여/' + topic.authorName)}`"
-                  ) 기여
+                  a(@click.stop, :href="contributionsUrl(topic.authorName)") 기여
                   | )
             .topic-info-area
               span.topic-updated_at(:to="`/${board.name}/${topic.id}`") {{ updatedAtString(topic) }}
@@ -67,6 +58,7 @@ import store from "@/store";
 import { decode } from "html-entities";
 import type { MetaInfo } from "vue-meta";
 import { DateTime } from "luxon";
+import { contributionsUrl, userTalkUrl, userUrl } from "@/wiki";
 
 @Component({
   components: {
@@ -88,6 +80,10 @@ export default class TopicListPage extends Vue {
   get board(): Board {
     return store.state.board;
   }
+
+  userUrl = userUrl;
+  userTalkUrl = userTalkUrl;
+  contributionsUrl = contributionsUrl;
 
   decodeTitle(x: string): string {
     return decode(x);
@@ -133,12 +129,10 @@ export default class TopicListPage extends Vue {
   }
 
   mounted(): void {
-    if (
-      store.state.board.isActive == true &&
-      store.state.user.isBlocked == false
-    ) {
-      store.commit("setCanWrite", true);
-    }
+    store.commit(
+      "setCanWrite",
+      store.state.board.isActive && !store.state.user.isBlocked
+    );
   }
 
   checkCanWrite(tp: Topic): boolean {
