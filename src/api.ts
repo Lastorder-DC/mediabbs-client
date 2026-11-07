@@ -267,3 +267,34 @@ export async function getLogs(params: {
   };
   return (await client.get<{ logs: LogEntry[]; hasMore: boolean }>("/admin/logs", { params: query })).data;
 }
+
+export type SearchField = "all" | "title" | "content" | "author";
+
+export interface SearchCommentHit {
+  id: number;
+  authorName: string;
+  createdAt: string;
+  /** Plain text around the first match. */
+  snippet: string;
+}
+
+export interface SearchHit {
+  topic: Topic;
+  boardName: string;
+  boardDisplayName: string;
+  titleMatch: boolean;
+  /** Matching comments; the first few are in `comments`. */
+  commentMatches: number;
+  comments: SearchCommentHit[];
+}
+
+/** Topic and comment search (`GET /search`), newest activity first. */
+export async function search(params: {
+  q: string;
+  in?: SearchField;
+  board?: number;
+  offset?: number;
+  limit?: number;
+}): Promise<{ results: SearchHit[]; hasMore: boolean }> {
+  return (await client.get<{ results: SearchHit[]; hasMore: boolean }>("/search", { params })).data;
+}

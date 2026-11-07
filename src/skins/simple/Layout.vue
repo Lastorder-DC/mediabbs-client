@@ -11,6 +11,7 @@ import { availableSkins, currentSkinName, setSkin } from "@/skins";
 import { useMenu } from "@/composables/useMenu";
 import { boardIconClass } from "@/menu";
 import SimpleMenu from "./SimpleMenu.vue";
+import BoardSearchForm from "@/components/BoardSearchForm.vue";
 import { defaultMenu } from "./menu";
 
 const { t } = useI18n();
@@ -66,6 +67,7 @@ useHead({
             <i v-if="board.icon" :class="boardIconClass(board.icon)" class="s-title-icon" aria-hidden="true" />{{ board.displayName }}
           </RouterLink>
         </h1>
+        <BoardSearchForm v-if="board.id" input-class="s-input" button-class="s-button" />
       </div>
       <div v-if="store.error" class="s-card s-error">{{ store.error }}</div>
       <RouterView v-else />
@@ -139,6 +141,25 @@ useHead({
 .simple-app .s-main {
   padding-top: 1rem;
   padding-bottom: 2rem;
+}
+.simple-app .s-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 0.8rem;
+}
+.simple-app .s-title-row .board-search {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.8rem;
+  flex: 0 1 16rem;
+}
+.simple-app .s-title-row .board-search .s-input {
+  min-width: 0;
+}
+.simple-app .s-title-row .board-search .s-button {
+  white-space: nowrap;
 }
 .simple-app .s-title-row h1 {
   margin: 0 0 0.8rem;

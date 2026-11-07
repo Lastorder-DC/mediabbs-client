@@ -18,7 +18,7 @@ const { t } = useI18n();
 const store = useAppStore();
 const PERMISSIONS: Permission[] = ["all", "users", "admins"];
 const NAME_RE = /^[a-z][a-z0-9_-]{0,63}$/;
-const RESERVED = ["auth", "admin", "api", "uploads", "config"];
+const RESERVED = ["auth", "admin", "api", "uploads", "config", "search"];
 
 const boards = ref<Board[]>([]);
 /** Board ids in the order shown (may differ from the saved order). */

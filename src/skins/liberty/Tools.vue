@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAppStore } from "@/stores/app";
+import BoardSearchForm from "@/components/BoardSearchForm.vue";
 
 const { t } = useI18n();
 const store = useAppStore();
@@ -19,6 +20,9 @@ onBeforeUnmount(() => document.removeEventListener("scroll", onScroll));
 
 <template>
   <div class="liberty-tools">
+    <BoardSearchForm v-if="store.board.id" input-class="input is-small" button-class="button is-small">
+      <b-icon icon="search" size="is-small" />
+    </BoardSearchForm>
     <button v-if="store.canWrite" class="button write-button" @click="store.openEditor()">
       <b-icon icon="edit" />
       <span>{{ t("common.write") }}</span>
@@ -47,6 +51,26 @@ onBeforeUnmount(() => document.removeEventListener("scroll", onScroll));
 </template>
 
 <style>
+.liberty-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.liberty-tools .board-search {
+  display: flex;
+}
+.liberty-tools .board-search .input {
+  width: 11rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.liberty-tools .board-search .button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+}
 .liberty-tools .write-button:hover {
   background-color: var(--bulma-primary);
   color: #fff;

@@ -21,4 +21,6 @@ export const SERVER_ERROR_KEYS: Record<string, string> = {
   "Invalid display name": "invalidDisplayName",
   "Invalid icon name": "invalidIcon",
   "Every board must be listed once": "boardOrderMismatch",
+  "Empty search": "emptySearch",
+  "Search is too long": "searchTooLong",
 };

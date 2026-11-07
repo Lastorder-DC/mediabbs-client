@@ -1,0 +1,126 @@
+/* Search page: skin-independent styles (colors follow the skin like admin.css). */
+.mb-search {
+  --mb-primary: var(--bulma-primary, var(--primary, #4188f1));
+  --mb-border: var(--liberty-border, var(--border, #d0d7de));
+  --mb-muted: var(--muted, #6b7280);
+  --mb-surface: var(--surface, #fff);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.mb-search h2.mb-search-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+}
+.mb-search ol,
+.mb-search ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mb-search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.mb-search-input,
+.mb-search-select,
+.mb-search-button {
+  font: inherit;
+  font-size: 0.95rem;
+  border: 1px solid var(--mb-border);
+  border-radius: 4px;
+  padding: 0.35rem 0.6rem;
+  background: var(--mb-surface);
+  color: inherit;
+  box-sizing: border-box;
+}
+.mb-search-input {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.mb-search-select {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+.mb-search-button {
+  background: var(--mb-primary);
+  border-color: var(--mb-primary);
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mb-search-button.secondary {
+  background: var(--mb-surface);
+  border-color: var(--mb-border);
+  color: inherit;
+}
+.mb-search-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.mb-search-help,
+.mb-search-muted {
+  color: var(--mb-muted);
+  font-size: 0.85rem;
+}
+.mb-search-help {
+  margin: 0.4rem 0 1rem;
+}
+.mb-search-error {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: #fdecea;
+  color: #c62828;
+}
+.mb-search-empty {
+  padding: 1rem 0;
+}
+.mb-search-hit {
+  padding: 0.7rem 0.2rem;
+  border-bottom: 1px solid var(--mb-border);
+}
+.mb-search-hit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.5rem;
+}
+.mb-search-board {
+  font-size: 0.75rem;
+  padding: 0 0.45rem;
+  border: 1px solid var(--mb-border);
+  border-radius: 999px;
+  color: var(--mb-muted);
+  white-space: nowrap;
+}
+.mb-search-topic {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.mb-search mark {
+  background: #fff1a8;
+  color: inherit;
+  padding: 0 0.05em;
+  border-radius: 2px;
+}
+.mb-search-comments {
+  margin-top: 0.4rem !important;
+  padding-left: 0.8rem !important;
+  border-left: 2px solid var(--mb-border);
+}
+.mb-search-comment + .mb-search-comment {
+  margin-top: 0.35rem;
+}
+.mb-search-comment-meta {
+  display: block;
+  color: var(--mb-muted);
+  font-size: 0.8rem;
+}
+.mb-search-snippet {
+  overflow-wrap: anywhere;
+}
+.mb-search-more {
+  margin-top: 0.8rem;
+  text-align: center;
+}

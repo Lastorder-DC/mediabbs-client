@@ -81,9 +81,14 @@ const board = computed(() => store.board);
 }
 .liberty-app .title-wrapper-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding: 1rem;
+}
+.liberty-app .title-wrapper-row .title {
+  margin-bottom: 0;
 }
 .liberty-app .title-wrapper-row .title {
   color: #000;
@@ -116,6 +121,18 @@ const board = computed(() => store.board);
   }
   .liberty-app .main-header .liberty-notice {
     margin: 0.5rem 0.5rem 0;
+  }
+}
+@media screen and (max-width: 600px) {
+  /* The board title gets its own line; search and write go below it. */
+  .liberty-app .title-wrapper-row .liberty-tools {
+    flex: 1 1 100%;
+  }
+  .liberty-app .title-wrapper-row .board-search {
+    flex: 1 1 auto;
+  }
+  .liberty-app .title-wrapper-row .board-search .input {
+    width: 100%;
   }
 }
 </style>

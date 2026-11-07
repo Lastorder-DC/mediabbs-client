@@ -45,6 +45,11 @@ export function createAppRouter(skin: Skin): Router {
         component: () => import("@/pages/admin/AdminPage.vue"),
       },
       {
+        path: "/search",
+        name: "Search",
+        component: () => import("@/pages/search/SearchPage.vue"),
+      },
+      {
         path: "/:boardName",
         name: "TopicList",
         component: skin.pages.topicList,

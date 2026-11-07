@@ -223,13 +223,13 @@ src/
   wiki.ts           위키 링크·API 헬퍼 (정식 이름공간 이름 사용)
   upload.ts         편집기 이미지 업로드
   theme.ts          테마 색 (CSS 변수)
-  router.ts         라우팅 (/, /auth, /admin, /:boardName, /:boardName/:topicId)
+  router.ts         라우팅 (/, /auth, /admin, /search, /:boardName, /:boardName/:topicId)
   i18n/             번역 (vue-i18n)
   stores/app.ts     공용 상태 (Pinia)
   composables/      스킨이 쓰는 동작 (주제 목록, 주제, 검색, 최근 바뀜 …)
   components/       공용 컴포넌트 (편집기, 마크다운 뷰어, Gravatar)
   menu.ts           상단 메뉴 형식 (MenuItemConfig → MenuEntry)
-  pages/            스킨 공용 페이지 (로그인 콜백, 관리 페이지 admin/)
+  pages/            스킨 공용 페이지 (로그인 콜백, 관리 페이지 admin/, 검색 search/)
   skins/            스킨 (liberty, simple) — docs/skins.md
 public/
   config.js         배포 시 바꾸는 런타임 설정

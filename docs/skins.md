@@ -84,6 +84,9 @@ interface Skin {
   `reset()`을 부릅니다. 무거우므로 `defineAsyncComponent`로 불러오는 것을 권장합니다.
 - `MarkdownViewer` — 의견 본문 표시 (GFM, 줄바꿈 하나도 줄바꿈으로 표시, HTML은 DOMPurify로 정리).
   편집기와 같은 본문 스타일(`.md-content`)을 씁니다.
+- `BoardSearchForm` — 게시판 화면의 검색창. 제출하면 현재 게시판으로 거른 `/search`를 엽니다.
+  `input-class`/`button-class`로 스킨 스타일을 입히고, 버튼 내용은 기본 슬롯으로 바꿀 수 있습니다.
+  검색 결과 페이지(`/search`)는 관리 페이지처럼 스킨 공용입니다.
 - `GravatarImage` — 사용자 아바타.
 
 공용 상태(`useAppStore()`)에서 자주 쓰는 것:
