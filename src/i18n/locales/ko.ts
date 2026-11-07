@@ -25,7 +25,7 @@ export default {
     write: "글쓰기",
     submit: "작성",
     close: "닫기",
-    more: "더보기",
+    more: "더 보기",
     scrollTop: "맨 위로",
     scrollBottom: "맨 아래로",
     language: "언어",

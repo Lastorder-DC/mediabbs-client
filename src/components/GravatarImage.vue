@@ -2,10 +2,15 @@
 // Gravatar by SHA-256 of the e-mail address (no e-mail: the default avatar).
 import { ref, watchEffect } from "vue";
 
-const props = withDefaults(defineProps<{ email?: string; size?: number }>(), {
-  email: "",
-  size: 80,
-});
+const props = withDefaults(
+  defineProps<{
+    email?: string;
+    size?: number;
+    /** Gravatar default image style (`d`), e.g. "mp", "identicon". */
+    fallback?: string;
+  }>(),
+  { email: "", size: 80, fallback: "mp" },
+);
 const src = ref("");
 
 async function sha256(text: string): Promise<string> {
@@ -16,7 +21,11 @@ async function sha256(text: string): Promise<string> {
 
 watchEffect(async () => {
   const hash = await sha256(props.email.trim().toLowerCase());
-  src.value = `https://www.gravatar.com/avatar/${hash}?s=${props.size}&d=mp`;
+  const d = encodeURIComponent(props.fallback);
+  // Without an e-mail, force the default image (same as the Liberty wiki skin).
+  src.value = hash
+    ? `https://www.gravatar.com/avatar/${hash}?s=${props.size}&d=${d}`
+    : `https://www.gravatar.com/avatar/${"0".repeat(32)}?s=${props.size}&d=${d}&f=y`;
 });
 </script>
 

@@ -22,10 +22,9 @@ const board = computed(() => store.board);
 <template>
   <div class="liberty-app">
     <NavBar />
-    <div class="main-container container">
-      <div class="columns main-columns">
-        <div class="column main-column">
-          <article class="box p-0 main-box">
+    <div class="main-container">
+      <div class="main-column">
+          <article class="main-box">
             <header class="main-header">
               <SiteNotice />
               <div class="title-wrapper-row">
@@ -41,11 +40,10 @@ const board = computed(() => store.board);
             </section>
             <FooterContent />
           </article>
-        </div>
-        <div class="column is-narrow is-hidden-touch">
-          <LiveRecent />
-        </div>
       </div>
+      <aside class="liberty-sidebar">
+        <LiveRecent />
+      </aside>
     </div>
     <EditorModal v-if="store.editor.open" />
     <ErrorModal />
@@ -53,52 +51,65 @@ const board = computed(() => store.board);
 </template>
 
 <style>
+/* Layout of the Liberty MediaWiki skin: 1200px wide, 15rem sidebar, no shadows. */
 .liberty-app .main-container {
-  margin-top: calc(var(--liberty-navbar-height) + 1rem);
-  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 3.33rem auto 0;
+  padding-bottom: 1rem;
 }
-@media screen and (min-width: 1408px) {
-  .liberty-app .container:not(.is-max-desktop):not(.is-max-widescreen) {
-    max-width: 1200px;
-  }
+.liberty-app .main-column {
+  flex: 1;
+  min-width: 0;
 }
-@media screen and (max-width: 1023px) {
-  .liberty-app .main-container {
-    margin-top: calc(var(--liberty-navbar-height) * 2 + 0.333rem);
-  }
-  .liberty-app .main-columns {
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .liberty-app .main-column {
-    padding: 0;
-  }
-}
-.liberty-app .main-box {
-  overflow: visible;
+.liberty-app .liberty-sidebar {
+  flex: 0 0 15rem;
+  width: 15rem;
 }
 .liberty-app .main-header {
-  padding: var(--liberty-box-padding);
-  border-top-left-radius: var(--bulma-radius-large);
-  border-top-right-radius: var(--bulma-radius-large);
   border: 1px solid var(--liberty-border);
+  border-radius: var(--liberty-radius) var(--liberty-radius) 0 0;
   background-color: var(--liberty-background);
 }
 .liberty-app .title-wrapper-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 1rem;
+}
+.liberty-app .title-wrapper-row .title {
+  color: #000;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.liberty-app .main-header .liberty-notice {
+  margin: 1rem 1rem 0;
 }
 .liberty-app .main-content {
   word-wrap: break-word;
-  padding: var(--liberty-box-padding);
+  padding: 1rem;
+  line-height: 1.6rem;
+  background-color: #fff;
   border-left: 1px solid var(--liberty-border);
   border-right: 1px solid var(--liberty-border);
 }
 @media screen and (max-width: 1023px) {
-  .liberty-app .main-header,
+  .liberty-app .main-container {
+    margin-top: 5.89rem;
+    padding-bottom: 0.5rem;
+  }
+  .liberty-app .liberty-sidebar {
+    display: none;
+  }
+  .liberty-app .title-wrapper-row,
   .liberty-app .main-content {
-    padding: calc(var(--liberty-box-padding) / 2);
+    padding: 0.5rem;
+  }
+  .liberty-app .main-header .liberty-notice {
+    margin: 0.5rem 0.5rem 0;
   }
 }
 </style>

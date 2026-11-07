@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { getConfig } from "@/config";
 import { availableLocales, currentLocale, setLocale } from "@/i18n";
 import type { LocaleCode } from "@/i18n";
 import { availableSkins, currentSkinName, setSkin } from "@/skins";
+import designedByLibre from "./assets/designedbylibre.png";
 
 const { t } = useI18n();
-const config = getConfig();
 const locales = availableLocales();
 const skins = availableSkins();
 const skin = currentSkinName();
@@ -14,7 +13,10 @@ const skin = currentSkinName();
 
 <template>
   <footer class="liberty-footer">
-    <a class="footer-wiki" :href="config.wiki.baseUrl">{{ config.wiki.siteName || config.wiki.baseUrl }}</a>
+    <!-- Same badge as the Liberty MediaWiki skin's footer. -->
+    <a class="designedbylibre" href="https://librewiki.net">
+      <img :src="designedByLibre" alt="Designed by Librewiki" />
+    </a>
     <div class="footer-right">
       <div class="footer-prefs">
         <label v-if="locales.length > 1" class="select is-small" :title="t('common.language')">
@@ -53,12 +55,16 @@ const skin = currentSkinName();
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--liberty-box-padding);
+  align-items: flex-end;
+  padding: 1rem;
   border: 1px solid var(--liberty-border);
-  border-bottom-left-radius: var(--bulma-radius-large);
-  border-bottom-right-radius: var(--bulma-radius-large);
+  border-bottom-left-radius: var(--liberty-radius);
+  border-bottom-right-radius: var(--liberty-radius);
   background-color: var(--liberty-background);
+}
+.liberty-footer .designedbylibre img {
+  display: block;
+  height: 31px;
 }
 .liberty-footer .footer-right {
   display: flex;
@@ -75,7 +81,7 @@ const skin = currentSkinName();
 }
 @media screen and (max-width: 1023px) {
   .liberty-footer {
-    padding: calc(var(--liberty-box-padding) / 2);
+    padding: 0.5rem;
   }
 }
 </style>

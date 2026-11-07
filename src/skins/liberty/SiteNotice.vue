@@ -16,7 +16,6 @@ const { html, fixLinks } = useSiteNotice();
   padding: 1rem;
   background-color: #d9edf7;
   border-radius: 0.25rem;
-  margin-bottom: 1rem;
   text-align: center;
 }
 .liberty-notice .toastui-editor-contents {
