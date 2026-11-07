@@ -59,3 +59,14 @@ select {
   border: 1px solid var(--border);
   border-radius: 8px;
 }
+/* Compose boxes are grids; let the editor shrink to the box (its toolbar
+   otherwise sets the minimum width and overflows). */
+.s-compose {
+  grid-template-columns: minmax(0, 1fr);
+}
+.s-compose > * {
+  min-width: 0;
+}
+.s-compose .toastui-editor-defaultUI {
+  width: 100%;
+}
