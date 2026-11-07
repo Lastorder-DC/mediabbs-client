@@ -296,6 +296,8 @@ export default {
       boardOrderMismatch: "게시판 목록이 바뀌었습니다. 새로 고친 뒤 다시 시도하세요.",
       emptySearch: "검색어를 입력하세요.",
       searchTooLong: "검색어는 100자까지 입력할 수 있습니다.",
+      searchBusy: "검색 요청이 많습니다. 잠시 뒤에 다시 시도하세요.",
+      tooManyPosts: "너무 자주 글을 쓰고 있습니다. 잠시 뒤에 다시 시도하세요.",
     },
   },
 };

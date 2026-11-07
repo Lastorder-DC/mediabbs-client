@@ -7,11 +7,13 @@
 #   PRIMARY_COLOR  theme color, e.g. #2e7d32
 #   MENUS          navigation menus per skin, JSON (inserted verbatim), e.g.
 #                  {"simple":[{"type":"boards"},{"type":"wiki"}]}
-set -eu
+set -euf  # -f: no filename expansion of values (e.g. "*" in SKINS)
 target=/usr/share/nginx/html/config.js
 
-# JSON/JS string literal (escapes backslashes and double quotes).
-str() { printf '"%s"' "$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"; }
+# (printf, not echo: some shells' echo interprets backslashes.)
+# JSON/JS string literal: control characters (newlines...) dropped, backslashes
+# and double quotes escaped.
+str() { printf '"%s"' "$(printf '%s' "$1" | tr -d '\000-\037' | sed 's/\\/\\\\/g; s/"/\\"/g')"; }
 
 if [ -z "${BACKEND_HOST:-}${SKIN:-}${SKINS:-}${PRIMARY_COLOR:-}${MENUS:-}" ]; then
     echo "mediabbs-client: no runtime settings given; using config.js from the image"
@@ -19,19 +21,19 @@ if [ -z "${BACKEND_HOST:-}${SKIN:-}${SKINS:-}${PRIMARY_COLOR:-}${MENUS:-}" ]; th
 fi
 
 {
-    echo "window.MEDIABBS_CONFIG = {"
-    [ -n "${BACKEND_HOST:-}" ] && echo "  backendHost: $(str "$BACKEND_HOST"),"
-    [ -n "${SKIN:-}" ] && echo "  skin: $(str "$SKIN"),"
+    printf '%s\n' "window.MEDIABBS_CONFIG = {"
+    [ -n "${BACKEND_HOST:-}" ] && printf '%s\n' "  backendHost: $(str "$BACKEND_HOST"),"
+    [ -n "${SKIN:-}" ] && printf '%s\n' "  skin: $(str "$SKIN"),"
     if [ -n "${SKINS:-}" ]; then
         list=""
         for s in $(printf '%s' "$SKINS" | tr ',' ' '); do
             list="${list:+$list, }$(str "$s")"
         done
-        echo "  skins: [$list],"
+        printf '%s\n' "  skins: [$list],"
     fi
-    [ -n "${PRIMARY_COLOR:-}" ] && echo "  primaryColor: $(str "$PRIMARY_COLOR"),"
-    [ -n "${MENUS:-}" ] && echo "  menus: $MENUS,"
-    echo "};"
+    [ -n "${PRIMARY_COLOR:-}" ] && printf '%s\n' "  primaryColor: $(str "$PRIMARY_COLOR"),"
+    [ -n "${MENUS:-}" ] && printf '%s\n' "  menus: $MENUS,"
+    printf '%s\n' "};"
 } > "$target"
 echo "mediabbs-client: wrote config.js:"
 cat "$target"

@@ -23,4 +23,6 @@ export const SERVER_ERROR_KEYS: Record<string, string> = {
   "Every board must be listed once": "boardOrderMismatch",
   "Empty search": "emptySearch",
   "Search is too long": "searchTooLong",
+  "Search is busy": "searchBusy",
+  "Too many posts": "tooManyPosts",
 };

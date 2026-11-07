@@ -237,6 +237,16 @@ docker/             Docker 이미지용 nginx 설정과 시작 스크립트
 contrib/librewiki/  리브레 위키 전용 자산
 ```
 
+## 보안
+
+- 의견 HTML은 DOMPurify로 정리합니다(`src/sanitize.ts`). 스크립트뿐 아니라 인라인 스타일과 폼도 지웁니다.
+  위키 사이트 공지는 위키 관리자가 쓰므로 인라인 스타일을 허용합니다.
+- Docker 이미지의 nginx는 CSP(`script-src 'self'`, `frame-ancestors 'none'` 등)와 `X-Frame-Options: DENY`를
+  보냅니다(`docker/security-headers.conf`). 직접 서빙한다면 같은 헤더를 붙이세요. `index.html`에 인라인
+  스크립트를 넣으면 CSP에 막힙니다.
+- 로그인 `state`는 탭마다 만든 무작위 값이어서, 다른 사이트가 자기 계정의 로그인 코드로 사용자를 로그인시킬 수
+  없습니다.
+
 ## 라이선스
 
 MIT. 원본 librebbs-client의 저작권 표기(Copyright (c) 2021 Librewiki Developers)를 따릅니다.

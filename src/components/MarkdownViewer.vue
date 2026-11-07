@@ -1,20 +1,25 @@
 <script setup lang="ts">
 // Renders Markdown (GFM; single newlines are line breaks, as the TOAST UI viewer
-// showed them) or HTML, sanitized with DOMPurify.
+// showed them) or HTML, sanitized with DOMPurify (src/sanitize.ts).
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { Marked } from "marked";
-import DOMPurify from "dompurify";
+import { sanitizeUserHtml, sanitizeWikiHtml } from "@/sanitize";
 import "./markdown-content.css";
 
 const props = defineProps<{
   content: string;
   /** Called with the rendered element, e.g. to rewrite links. */
   postProcess?: (el: HTMLElement) => void;
+  /** Wiki HTML from wiki administrators (site notice): keeps inline styles. */
+  trusted?: boolean;
 }>();
 
 const marked = new Marked({ gfm: true, breaks: true, async: false });
 
-const html = computed(() => DOMPurify.sanitize(marked.parse(props.content ?? "") as string));
+const html = computed(() => {
+  const raw = marked.parse(props.content ?? "") as string;
+  return props.trusted ? sanitizeWikiHtml(raw) : sanitizeUserHtml(raw);
+});
 const el = ref<HTMLElement | null>(null);
 
 function runPostProcess(): void {

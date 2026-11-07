@@ -299,6 +299,8 @@ const en: typeof ko = {
       boardOrderMismatch: "The board list has changed. Reload and try again.",
       emptySearch: "Enter something to search for.",
       searchTooLong: "Searches can be up to 100 characters.",
+      searchBusy: "Too many searches right now. Try again in a moment.",
+      tooManyPosts: "You are posting too often. Try again in a moment.",
     },
   },
 };

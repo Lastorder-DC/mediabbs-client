@@ -3,7 +3,7 @@ import type { ComputedRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { getConfig, runtimeConfig, serverMenus } from "@/config";
 import type { NavLink } from "@/config";
-import { BUILTIN_ICONS, boardIconClass, isBuiltin } from "@/menu";
+import { BUILTIN_ICONS, boardIconClass, isBuiltin, safeHref } from "@/menu";
 import type { MenuEntry, MenuItemConfig, MenuLink, MenuText } from "@/menu";
 import { currentSkinName } from "@/skins";
 import { useAppStore } from "@/stores/app";
@@ -50,9 +50,9 @@ export function useMenu(skinDefault: MenuItemConfig[]): ComputedRef<MenuEntry[]>
     key,
     label: link.label,
     icon: link.icon,
-    href: link.url,
+    href: safeHref(link.url),
     children: link.children?.length
-      ? link.children.map((c, i) => ({ key: `${key}-${i}`, label: c.label, href: c.url }))
+      ? link.children.map((c, i) => ({ key: `${key}-${i}`, label: c.label, href: safeHref(c.url) }))
       : undefined,
   });
 
@@ -66,9 +66,9 @@ export function useMenu(skinDefault: MenuItemConfig[]): ComputedRef<MenuEntry[]>
           key,
           label: text(item.label, ""),
           icon: item.icon,
-          href: item.url,
+          href: safeHref(item.url),
           children: item.children?.map(
-            (c, i): MenuLink => ({ key: `${key}-${i}`, label: text(c.label, ""), href: c.url }),
+            (c, i): MenuLink => ({ key: `${key}-${i}`, label: text(c.label, ""), href: safeHref(c.url) }),
           ),
         });
         return;

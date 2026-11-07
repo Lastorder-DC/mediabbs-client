@@ -16,6 +16,7 @@ RUN node .yarn/releases/yarn-4.9.1.cjs build
 # ---- runtime ----
 FROM nginx:1-alpine
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/security-headers.conf /etc/nginx/snippets/mediabbs-security-headers.conf
 COPY docker/40-mediabbs-config.sh /docker-entrypoint.d/40-mediabbs-config.sh
 COPY --from=build /app/dist /usr/share/nginx/html
 # Writable by the entrypoint script, which generates config.js from the environment.

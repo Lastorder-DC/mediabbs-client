@@ -90,3 +90,15 @@ export const BUILTIN_ICONS: Record<BuiltinMenuType, string | undefined> = {
   wiki: "book",
   navLinks: undefined,
 };
+
+/**
+ * A link from menu settings, if it is an http(s) URL or a site path (the
+ * backend checks this too); anything else (`javascript:`, `//host`, `/\host`)
+ * becomes "#".
+ */
+export function safeHref(url: string): string;
+export function safeHref(url: string | undefined): string | undefined;
+export function safeHref(url: string | undefined): string | undefined {
+  if (url === undefined) return undefined;
+  return /^(https?:\/\/|\/(?![/\\]))/i.test(url) && !/[\\\s]/.test(url) ? url : "#";
+}

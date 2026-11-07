@@ -7,7 +7,7 @@ const { html, fixLinks } = useSiteNotice();
 
 <template>
   <div v-if="html" class="liberty-notice">
-    <MarkdownViewer class="sitenotice" :content="html" :post-process="fixLinks" />
+    <MarkdownViewer class="sitenotice" :content="html" :post-process="fixLinks" trusted />
   </div>
 </template>
 
