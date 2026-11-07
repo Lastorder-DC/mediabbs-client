@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 .yarn/*
 !.yarn/releases
+
+# vite-plugin-pwa dev output
+/dev-dist

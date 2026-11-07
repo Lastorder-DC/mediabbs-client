@@ -3,6 +3,7 @@
 // MediaWiki accepts them in every content language.
 import axios from "axios";
 import { getConfig } from "@/config";
+import { t } from "@/i18n";
 
 /** Encodes a page title for use in an article URL (spaces become underscores). */
 export function encodeTitle(title: string): string {
@@ -60,13 +61,22 @@ export function absoluteWikiHref(href: string): string {
   return href;
 }
 
+/** Name of the board site: SITE_NAME, else "<wiki name> 게시판/Board". */
+export function boardSiteName(): string {
+  const config = getConfig();
+  if (config.siteName && config.siteName !== config.wiki.siteName) {
+    return config.siteName;
+  }
+  return config.wiki.siteName
+    ? t("site.wikiBoard", { wiki: config.wiki.siteName })
+    : t("site.board");
+}
+
 /**
  * Anonymous, read-only call to the wiki's action API. `origin=*` lets the wiki
  * answer cross-origin requests without any CORS configuration on its side.
  */
-export async function wikiApi<T>(
-  params: Record<string, string | number | boolean>
-): Promise<T> {
+export async function wikiApi<T>(params: Record<string, string | number | boolean>): Promise<T> {
   const { data } = await axios.get<T>(getConfig().wiki.apiUrl, {
     params: { format: "json", formatversion: 2, origin: "*", ...params },
   });

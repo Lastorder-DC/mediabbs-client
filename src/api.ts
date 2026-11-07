@@ -1,13 +1,7 @@
-import axios from "axios";
-import type { LockManager } from "navigator.locks";
+import axios, { AxiosError } from "axios";
 import { refreshToken } from "@/auth";
 import { backendHost } from "@/config";
-
-declare global {
-  interface Navigator {
-    locks: LockManager;
-  }
-}
+import { t, translateServerError } from "@/i18n";
 
 const client = axios.create({
   baseURL: backendHost,
@@ -15,22 +9,39 @@ const client = axios.create({
 });
 
 client.interceptors.response.use(
-  async (response) => response,
-  async (error) => {
-    const {
-      config,
-      response: { status },
-    } = error;
-    if (status === 401 && error.response.data === "TokenExpired") {
-      const originalRequest = config;
+  (response) => response,
+  async (error: AxiosError) => {
+    const config = error.config as (typeof error.config & { _retried?: boolean }) | undefined;
+    if (
+      config &&
+      !config._retried &&
+      error.response?.status === 401 &&
+      error.response.data === "TokenExpired"
+    ) {
+      config._retried = true;
       await refreshToken();
-      return client(originalRequest);
+      return client(config);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
-interface UserInfo {
+/** User-facing message for an API error. */
+export function errorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) return t("error.network");
+    const translated = translateServerError(error.response.data);
+    if (translated) return translated;
+    if (typeof error.response.data === "string" && error.response.data.length < 200) {
+      return error.response.data || t("error.generic");
+    }
+    return t("error.generic");
+  }
+  if (error instanceof Error) return error.message;
+  return t("error.generic");
+}
+
+export interface UserInfo {
   id: number;
   blocked: boolean;
   confirmedEmail: boolean;
@@ -41,12 +52,7 @@ interface UserInfo {
   isAdmin: boolean;
 }
 
-async function getUserInfo(): Promise<UserInfo> {
-  const { data } = await client.get<UserInfo>("/me");
-  return data;
-}
-
-interface Board {
+export interface Board {
   id: number;
   displayName: string;
   name: string;
@@ -55,12 +61,7 @@ interface Board {
   updatedAt: string;
 }
 
-async function getBoards(): Promise<Board[]> {
-  const { data } = await client.get<Board[]>(`/boards`);
-  return data;
-}
-
-interface Topic {
+export interface Topic {
   id: number;
   boardId: number;
   title: string;
@@ -75,95 +76,7 @@ interface Topic {
   updatedAt: string;
 }
 
-async function getTopics(
-  boardId: number,
-  offset: number,
-  limit: number
-): Promise<Topic[]> {
-  const { data } = await client.get<Topic[]>(`/boards/${boardId}/topics`, {
-    params: {
-      offset,
-      limit,
-    },
-  });
-  return data;
-}
-
-async function getTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.get<Topic>(`/topics/${topicId}`);
-  return data;
-}
-
-async function postTopic(
-  boardId: number,
-  title: string,
-  content: string
-): Promise<Topic> {
-  const { data } = await client.post<Topic>("/topics", {
-    boardId: boardId,
-    title,
-    content,
-  });
-  return data;
-}
-
-async function hideTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isHidden: true,
-  });
-  return data;
-}
-
-async function unhideTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isHidden: false,
-  });
-  return data;
-}
-
-async function suspendTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isSuspended: true,
-  });
-  return data;
-}
-
-async function unsuspendTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isSuspended: false,
-  });
-  return data;
-}
-
-async function closeTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isClosed: true,
-  });
-  return data;
-}
-
-async function uncloseTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isClosed: false,
-  });
-  return data;
-}
-
-async function pinTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isPinned: true,
-  });
-  return data;
-}
-
-async function unpinTopic(topicId: number): Promise<Topic> {
-  const { data } = await client.put<Topic>(`/topics/${topicId}/status`, {
-    isPinned: false,
-  });
-  return data;
-}
-
-interface Comment {
+export interface Comment {
   id: number;
   topicId: number;
   content: null | string;
@@ -174,91 +87,63 @@ interface Comment {
   updatedAt: string;
 }
 
-async function getComments(
+export type TopicStatus = Partial<
+  Pick<Topic, "isClosed" | "isSuspended" | "isHidden" | "isPinned">
+>;
+
+export async function getUserInfo(): Promise<UserInfo> {
+  return (await client.get<UserInfo>("/me")).data;
+}
+
+export async function getBoards(): Promise<Board[]> {
+  return (await client.get<Board[]>("/boards")).data;
+}
+
+export async function getTopics(boardId: number, offset: number, limit: number): Promise<Topic[]> {
+  return (await client.get<Topic[]>(`/boards/${boardId}/topics`, { params: { offset, limit } }))
+    .data;
+}
+
+export async function getTopic(topicId: number): Promise<Topic> {
+  return (await client.get<Topic>(`/topics/${topicId}`)).data;
+}
+
+export async function postTopic(boardId: number, title: string, content: string): Promise<Topic> {
+  return (await client.post<Topic>("/topics", { boardId, title, content })).data;
+}
+
+/** Moderation: change one status flag of a topic (one log entry per request). */
+export async function setTopicStatus(topicId: number, status: TopicStatus): Promise<Topic> {
+  return (await client.put<Topic>(`/topics/${topicId}/status`, status)).data;
+}
+
+export async function getComments(
   topicId: number,
   offset: number,
-  limit: number
+  limit: number,
 ): Promise<Comment[]> {
-  const { data } = await client.get<Comment[]>(`/topics/${topicId}/comments`, {
-    params: {
-      offset,
-      limit,
-    },
-  });
-  return data;
+  return (
+    await client.get<Comment[]>(`/topics/${topicId}/comments`, { params: { offset, limit } })
+  ).data;
 }
 
-async function getComment(
-  commentId: number,
-  showHidden: boolean
-): Promise<Comment> {
-  const { data } = await client.get<Comment>(`/comments/${commentId}`, {
-    params: {
-      showHidden: showHidden,
-    },
-  });
-  return data;
+export async function getComment(commentId: number, showHidden: boolean): Promise<Comment> {
+  return (await client.get<Comment>(`/comments/${commentId}`, { params: { showHidden } })).data;
 }
 
-async function postComment(
-  topicId: number,
-  content: string
-): Promise<Comment[]> {
-  const { data } = await client.post(`/topics/${topicId}/comments`, {
-    content,
-  });
-  return data;
+export async function postComment(topicId: number, content: string): Promise<void> {
+  await client.post(`/topics/${topicId}/comments`, { content });
 }
 
-async function hideComment(commentId: number): Promise<Comment> {
-  const { data } = await client.put<Comment>(`/comments/${commentId}/status`, {
-    isHidden: true,
-  });
-  return data;
+export async function setCommentHidden(commentId: number, isHidden: boolean): Promise<Comment> {
+  return (await client.put<Comment>(`/comments/${commentId}/status`, { isHidden })).data;
 }
 
-async function unhideComment(commentId: number): Promise<Comment> {
-  const { data } = await client.put<Comment>(`/comments/${commentId}/status`, {
-    isHidden: false,
-  });
-  return data;
-}
-
-interface FileResponse {
+export interface FileResponse {
   path: string;
   url: string;
 }
 
-async function postFile(
-  filename: string,
-  content: string
-): Promise<FileResponse> {
-  const { data } = await client.post<FileResponse>("/files", {
-    filename,
-    content,
-  });
-  return data;
+export async function postFile(filename: string, content: string): Promise<FileResponse> {
+  return (await client.post<FileResponse>("/files", { filename, content })).data;
 }
-
-export {
-  getUserInfo,
-  getBoards,
-  getTopics,
-  getTopic,
-  getComment,
-  getComments,
-  postTopic,
-  postComment,
-  postFile,
-  hideComment,
-  unhideComment,
-  hideTopic,
-  unhideTopic,
-  suspendTopic,
-  unsuspendTopic,
-  closeTopic,
-  uncloseTopic,
-  pinTopic,
-  unpinTopic,
-};
-export type { UserInfo, Board, Topic, Comment };

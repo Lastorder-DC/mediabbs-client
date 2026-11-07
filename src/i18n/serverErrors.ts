@@ -1,0 +1,17 @@
+// Backend error bodies (see mediabbs docs/api.md) -> `error.server.*` message keys.
+export const SERVER_ERROR_KEYS: Record<string, string> = {
+  "Topic is not found": "topicNotFound",
+  "Topic is hidden": "topicHidden",
+  "Topic is closed": "topicClosed",
+  "Topic is suspended": "topicSuspended",
+  "Board is not found": "boardNotFound",
+  "Board is not active": "boardInactive",
+  "Comment is not found": "commentNotFound",
+  "You are blocked": "blocked",
+  "TokenMissing": "tokenMissing",
+  "TokenInvalid": "tokenInvalid",
+  "LoginRequired": "loginRequired",
+  "File is too large": "fileTooLarge",
+  "Uploads are disabled": "uploadsDisabled",
+  "File content does not match its extension": "fileMismatch",
+};

@@ -20,7 +20,7 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: yarn lint --no-fix
+      - run: yarn lint:check
 
       - run: |
           yarn build
@@ -28,9 +28,10 @@ jobs:
         env:
           # Optional: bake the backend URL into the build. It can also be set
           # after deployment by editing config.js.
-          VUE_APP_BACKEND_HOST: ${{ vars.BACKEND_HOST }}
-          VUE_APP_PRIMARY_COLOR: ${{ vars.PRIMARY_COLOR }}
-          VUE_APP_SITE_NAME: ${{ vars.SITE_NAME }}
+          VITE_BACKEND_HOST: ${{ vars.BACKEND_HOST }}
+          VITE_PRIMARY_COLOR: ${{ vars.PRIMARY_COLOR }}
+          VITE_SITE_NAME: ${{ vars.SITE_NAME }}
+          VITE_DEFAULT_SKIN: ${{ vars.DEFAULT_SKIN }}
 
       - name: Write runtime config.js
         if: ${{ vars.BACKEND_HOST != '' }}

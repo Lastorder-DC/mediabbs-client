@@ -1,53 +1,46 @@
 import axios from "axios";
 import { backendHost, getConfig } from "@/config";
 
-function startLoginProcess(state: string): void {
+export function startLoginProcess(state: string): void {
   const { oauth } = getConfig();
   const params = new URLSearchParams({
     response_type: "code",
     client_id: oauth.clientId,
     state,
   });
-  location.replace(`${oauth.authorizeUrl}?${params.toString()}`);
+  location.assign(`${oauth.authorizeUrl}?${params.toString()}`);
 }
 
-async function logout(): Promise<void> {
-  await axios.post(`${backendHost}/auth/logout`, null, {
-    withCredentials: true,
-  });
+export async function logout(): Promise<void> {
+  await axios.post(`${backendHost}/auth/logout`, null, { withCredentials: true });
 }
 
-async function getToken(code: string): Promise<void> {
-  await axios.post(
-    `${backendHost}/auth/login`,
-    { code },
-    {
-      withCredentials: true,
-    }
-  );
+export async function getToken(code: string): Promise<void> {
+  await axios.post(`${backendHost}/auth/login`, { code }, { withCredentials: true });
 }
 
-// refresh token or wait until it is refreshed by another one
-async function refreshToken(): Promise<void> {
-  // make sure only one refresh request is sent
-  await navigator.locks.request(
-    "refreshToken",
-    { ifAvailable: true },
-    async (lock) => {
-      try {
-        if (lock) {
-          await axios.post(`${backendHost}/auth/refresh`, null, {
-            withCredentials: true,
-          });
-        } else {
-          await navigator.locks.request("refresh", () => null); // wait first refresh request done
-        }
-      } catch {
-        logout();
-        location.reload();
-      }
-    }
-  );
+/** Refreshes the access token; concurrent callers wait for a single request. */
+let pending: Promise<void> | null = null;
+
+async function doRefresh(): Promise<void> {
+  try {
+    await axios.post(`${backendHost}/auth/refresh`, null, { withCredentials: true });
+  } catch {
+    await logout().catch(() => undefined);
+    location.reload();
+  }
 }
 
-export { startLoginProcess, getToken, refreshToken, logout };
+export function refreshToken(): Promise<void> {
+  // Web Locks coordinate the refresh across tabs; fall back to one per tab.
+  if (!pending) {
+    const run =
+      "locks" in navigator
+        ? navigator.locks.request("mediabbs-refresh-token", doRefresh)
+        : doRefresh();
+    pending = Promise.resolve(run).finally(() => {
+      pending = null;
+    });
+  }
+  return pending;
+}

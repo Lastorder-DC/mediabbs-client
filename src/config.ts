@@ -1,8 +1,10 @@
-// Runtime configuration served by the mediabbs backend (`GET /config`).
-// Loaded once before the app is mounted (see main.ts), so components can read
-// `config` synchronously.
+// Configuration:
+//  - runtime/deploy-time settings from public/config.js (`window.MEDIABBS_CONFIG`)
+//  - public settings served by the mediabbs backend (`GET /config`), loaded once
+//    before the app is mounted (see main.ts) so components can read them
+//    synchronously.
 import axios from "axios";
-import Vue from "vue";
+import { shallowRef } from "vue";
 
 export interface NavLink {
   label: string;
@@ -46,42 +48,44 @@ export interface PublicConfig {
   };
 }
 
+/** Settings from public/config.js. */
+export interface RuntimeConfig {
+  backendHost?: string;
+  /** Default skin name. */
+  skin?: string;
+  /** Skins users may choose from (default: all bundled skins). */
+  skins?: string[];
+  /** Theme color (hex). */
+  primaryColor?: string;
+}
+
 declare global {
   interface Window {
-    /** Set by public/config.js (runtime, deploy-time settings). */
-    MEDIABBS_CONFIG?: { backendHost?: string };
+    MEDIABBS_CONFIG?: RuntimeConfig;
   }
 }
 
-/** Backend URL: runtime config.js first, then VUE_APP_BACKEND_HOST (build time). */
+export const runtimeConfig: RuntimeConfig = window.MEDIABBS_CONFIG || {};
+
+/** Backend URL: runtime config.js first, then VITE_BACKEND_HOST (build time). */
 export const backendHost: string = (
-  window.MEDIABBS_CONFIG?.backendHost ||
-  process.env.VUE_APP_BACKEND_HOST ||
+  runtimeConfig.backendHost ||
+  import.meta.env.VITE_BACKEND_HOST ||
   ""
 ).replace(/\/+$/, "");
 
-// Reactive so templates update if the config object is replaced.
-const state = Vue.observable({ config: null as PublicConfig | null });
+const state = shallowRef<PublicConfig | null>(null);
 
 export async function loadConfig(): Promise<PublicConfig> {
   const { data } = await axios.get<PublicConfig>(`${backendHost}/config`);
-  state.config = data;
+  state.value = data;
   return data;
 }
 
 /** The loaded configuration. Only valid after `loadConfig()` resolved. */
 export function getConfig(): PublicConfig {
-  if (!state.config) {
+  if (!state.value) {
     throw new Error("config is not loaded yet");
   }
-  return state.config;
-}
-
-/** Name shown for the board site: SITE_NAME, else "<wiki name> 게시판". */
-export function boardSiteName(): string {
-  const config = getConfig();
-  if (config.siteName && config.siteName !== config.wiki.siteName) {
-    return config.siteName;
-  }
-  return config.wiki.siteName ? `${config.wiki.siteName} 게시판` : "게시판";
+  return state.value;
 }

@@ -1,0 +1,33 @@
+// Global styles of the Liberty skin. Bulma 1 / Buefy 3 read the theme color from
+// CSS variables (set at runtime, see src/theme.ts), so $primary here is only the
+// build-time default.
+@use "bulma/sass" with (
+  $primary: #4188f1,
+  $link: #337ab7,
+  $radius: 0.35rem,
+  $family-primary: '"Apple SD Gothic Neo", "Spoqa Han Sans", "Noto Sans KR", "Noto Sans", "Noto Sans CJK KR", "NanumBarunGothic", "Nanum Gothic", "Malgun Gothic", "맑은 고딕", sans-serif'
+);
+@use "buefy/src/scss/buefy";
+
+:root {
+  --liberty-navbar-height: 2.8rem;
+  --liberty-border: #e1e8ed;
+  --liberty-background: #f5f8fa;
+  --liberty-box-padding: 1.25rem;
+  --liberty-new-link: #b73333;
+  --liberty-primary-dark: hsl(var(--bulma-primary-h), var(--bulma-primary-s), calc(var(--bulma-primary-l) - 8%));
+  --liberty-primary-light: hsl(var(--bulma-primary-h), var(--bulma-primary-s), calc(var(--bulma-primary-l) + 8%));
+}
+
+html {
+  background-color: #f5f5f5;
+  font-size: 15px;
+}
+
+* {
+  outline: none;
+}
+
+a.new {
+  color: var(--liberty-new-link);
+}
