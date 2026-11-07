@@ -21,7 +21,7 @@ Vue 3 + TypeScript + Vite로 만든 단일 페이지 앱이며, 빌드하면 정
 ### 1. 정적 파일로 배포
 
 ```sh
-yarn install          # Node.js 20.19 이상 (22에서 검증). yarn은 저장소에 포함된 4.x가 쓰입니다
+yarn install          # Node.js 20.19 이상 (24에서 검증). yarn은 저장소에 포함된 4.x가 쓰입니다
 yarn build            # 타입 검사 후 빌드. 결과물: dist/
 ```
 

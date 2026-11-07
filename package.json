@@ -14,7 +14,7 @@
   },
   "packageManager": "yarn@4.9.1",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6",
+    "@fortawesome/fontawesome-free": "^7",
     "@toast-ui/editor": "^3",
     "@unhead/vue": "^3",
     "axios": "^1",
@@ -34,16 +34,19 @@
     "@vue/devtools-api": "^8.2.1",
     "@vue/eslint-config-prettier": "^10",
     "@vue/eslint-config-typescript": "^14",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-plugin-vue": "^10",
     "prettier": "^3",
     "sass": "^1",
-    "typescript": "~5.9",
+    "typescript": "~6.0",
     "typescript-eslint": "^8",
     "vite": "^8",
     "vite-plugin-pwa": "^2",
     "vue-eslint-parser": "^10.4.2",
     "vue-tsc": "^3",
     "workbox-window": "^7"
+  },
+  "resolutions": {
+    "dompurify": "^3.4.17"
   }
 }
