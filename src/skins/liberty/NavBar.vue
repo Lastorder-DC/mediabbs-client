@@ -3,12 +3,15 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useSession } from "@/composables/useSession";
 import { useWikiSearch } from "@/composables/useWikiSearch";
+import { useMenu } from "@/composables/useMenu";
+import { defaultMenu } from "./menu";
 import GravatarImage from "@/components/GravatarImage.vue";
 import defaultLogo from "@/assets/logo.svg";
 
 const { t } = useI18n();
 const session = useSession();
-const { user, boards, navLinks, special } = session;
+const { user, special } = session;
+const menu = useMenu(defaultMenu);
 const search = useWikiSearch();
 const logoFailed = ref(false);
 </script>
@@ -26,57 +29,23 @@ const logoFailed = ref(false);
             />
             <span class="navbar-text">{{ session.wikiName }}</span>
           </a>
-          <a class="navbar-item" :href="special('RecentChanges')" :title="t('nav.recentChanges')">
-            <b-icon icon="sync" />
-            <span class="navbar-text">{{ t("nav.recentChanges") }}</span>
-          </a>
-          <a class="navbar-item" :href="special('Random')" :title="t('nav.random')">
-            <b-icon icon="random" />
-            <span class="navbar-text">{{ t("nav.random") }}</span>
-          </a>
-          <b-dropdown v-if="boards.length">
-            <template #trigger>
-              <a class="navbar-item" role="button" :title="t('nav.boards')">
-                <b-icon icon="comments" />
-                <span class="navbar-text">{{ t("nav.boards") }}</span>
-                <b-icon class="navbar-caret" icon="caret-down" />
-              </a>
-            </template>
-            <b-dropdown-item v-for="b in boards" :key="b.id" has-link>
-              <RouterLink :to="`/${b.name}`">{{ b.displayName }}</RouterLink>
-            </b-dropdown-item>
-          </b-dropdown>
-          <b-dropdown>
-            <template #trigger>
-              <a class="navbar-item" role="button" :title="t('nav.tools')">
-                <b-icon icon="wrench" />
-                <span class="navbar-text">{{ t("nav.tools") }}</span>
-                <b-icon class="navbar-caret" icon="caret-down" />
-              </a>
-            </template>
-            <b-dropdown-item has-link>
-              <a :href="special('Upload')">{{ t("nav.upload") }}</a>
-            </b-dropdown-item>
-            <b-dropdown-item has-link>
-              <a :href="special('SpecialPages')">{{ t("nav.specialPages") }}</a>
-            </b-dropdown-item>
-          </b-dropdown>
-          <template v-for="(link, i) in navLinks" :key="`nav-${i}`">
-            <b-dropdown v-if="link.children && link.children.length">
+          <template v-for="entry in menu" :key="entry.key">
+            <b-dropdown v-if="entry.children">
               <template #trigger>
-                <a class="navbar-item" role="button">
-                  <b-icon v-if="link.icon" :icon="link.icon" />
-                  <span class="navbar-text">{{ link.label }}</span>
+                <a class="navbar-item" role="button" :title="entry.label">
+                  <b-icon v-if="entry.icon" :icon="entry.icon" />
+                  <span class="navbar-text">{{ entry.label }}</span>
                   <b-icon class="navbar-caret" icon="caret-down" />
                 </a>
               </template>
-              <b-dropdown-item v-for="(child, j) in link.children" :key="j" has-link>
-                <a :href="child.url">{{ child.label }}</a>
+              <b-dropdown-item v-for="child in entry.children" :key="child.key" has-link>
+                <RouterLink v-if="child.to" :to="child.to">{{ child.label }}</RouterLink>
+                <a v-else :href="child.href">{{ child.label }}</a>
               </b-dropdown-item>
             </b-dropdown>
-            <a v-else class="navbar-item" :href="link.url">
-              <b-icon v-if="link.icon" :icon="link.icon" />
-              <span class="navbar-text">{{ link.label }}</span>
+            <a v-else class="navbar-item" :href="entry.href" :title="entry.label">
+              <b-icon v-if="entry.icon" :icon="entry.icon" />
+              <span class="navbar-text">{{ entry.label }}</span>
             </a>
           </template>
         </div>

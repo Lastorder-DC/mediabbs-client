@@ -10,6 +10,7 @@ const en: typeof ko = {
     recentChanges: "Recent changes",
     random: "Random page",
     boards: "Boards",
+    wiki: "Wiki",
     tools: "Tools",
     upload: "Upload file",
     specialPages: "Special pages",

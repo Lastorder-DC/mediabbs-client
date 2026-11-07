@@ -8,6 +8,7 @@ export default {
     recentChanges: "최근 바뀜",
     random: "임의 문서",
     boards: "게시판",
+    wiki: "위키",
     tools: "도구",
     upload: "파일 업로드",
     specialPages: "특수 문서 목록",

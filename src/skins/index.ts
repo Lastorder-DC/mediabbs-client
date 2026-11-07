@@ -9,7 +9,7 @@ export const SKINS: Record<string, SkinEntry> = {
 };
 
 const STORAGE_KEY = "mediabbs.skin";
-const FALLBACK = "liberty";
+const FALLBACK = "simple";
 
 /** Skins users may choose from: config.js `skins`, else every bundled skin. */
 export function availableSkins(): { name: string; label: string }[] {

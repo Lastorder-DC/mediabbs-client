@@ -7,8 +7,9 @@ Vue 3 + TypeScript + Vite로 만든 단일 페이지 앱이며, 빌드하면 정
 **백엔드 주소 하나만 알려 주면** 나머지 설정(위키 주소, OAuth 정보, 메뉴, 업로드 설정 등)은 백엔드의
 `GET /config`에서 받아 오므로, 같은 빌드를 어느 위키에나 배포할 수 있습니다.
 
-- **스킨**: 화면 디자인을 스킨으로 바꿀 수 있습니다. 기본은 리브레 위키와 같은 모양의 `liberty`,
-  가벼운 `simple`도 들어 있습니다. 새 스킨 만들기는 [docs/skins.md](docs/skins.md).
+- **스킨**: 화면 디자인을 스킨으로 바꿀 수 있습니다. 기본은 가벼운 `simple`이고, 리브레 위키(Liberty
+  위키 스킨)와 같은 모양의 `liberty`도 들어 있습니다. 상단 메뉴는 스킨마다 따로 정할 수 있습니다.
+  새 스킨 만들기는 [docs/skins.md](docs/skins.md).
 - **다국어**: 한국어·영어. 방문자가 화면 아래에서 고를 수 있고, 기본값은 백엔드의 `SITE_LOCALE`,
   없으면 위키의 언어, 그다음 브라우저 언어입니다.
 
@@ -29,9 +30,10 @@ yarn build            # 타입 검사 후 빌드. 결과물: dist/
 ```js
 window.MEDIABBS_CONFIG = {
   backendHost: "https://bbs.example.org/api",
-  skin: "liberty",            // 기본 스킨 (선택)
+  skin: "liberty",            // 기본 스킨 (선택, 기본: simple)
   // skins: ["liberty"],      // 방문자가 고를 수 있는 스킨을 제한 (선택, 기본: 전부)
   // primaryColor: "#2e7d32", // 테마 색 (선택)
+  // menus: { simple: [{ type: "boards" }, { type: "wiki" }] },  // 스킨별 상단 메뉴 (선택)
 };
 ```
 
@@ -81,6 +83,7 @@ nginx 기반 이미지이며, 컨테이너가 시작할 때 환경 변수로 `co
 | `SKIN` | `skin` | 기본 스킨 |
 | `SKINS` | `skins` | 고를 수 있는 스킨, 쉼표로 구분 (예: `liberty,simple`) |
 | `PRIMARY_COLOR` | `primaryColor` | 테마 색 (예: `#2e7d32`) |
+| `MENUS` | `menus` | 스킨별 상단 메뉴, JSON 그대로 (예: `{"simple":[{"type":"boards"},{"type":"wiki"}]}`) |
 
 빌드 시 기본값은 `--build-arg VITE_PRIMARY_COLOR=#2e7d32`처럼 넘깁니다.
 
@@ -106,7 +109,8 @@ Pages 주소를 넣는 것을 잊지 마세요. Pages와 백엔드가 서로 다
 | 설정 | 언제 | 어디서 |
 |---|---|---|
 | 백엔드 주소 | 배포 시 | `config.js`의 `backendHost` (Docker: `BACKEND_HOST`) — 또는 빌드 시 `VITE_BACKEND_HOST` |
-| 기본 스킨 | 배포 시 | `config.js`의 `skin` (Docker: `SKIN`) — 또는 빌드 시 `VITE_DEFAULT_SKIN` (기본 `liberty`) |
+| 기본 스킨 | 배포 시 | `config.js`의 `skin` (Docker: `SKIN`) — 또는 빌드 시 `VITE_DEFAULT_SKIN` (기본 `simple`) |
+| 상단 메뉴 | 배포 시 | `config.js`의 `menus` (Docker: `MENUS`), 스킨별. 아래 "상단 메뉴" 참고 |
 | 고를 수 있는 스킨 | 배포 시 | `config.js`의 `skins` (Docker: `SKINS`). 하나만 남기면 스킨 선택이 사라집니다 |
 | 테마 색 | 배포 시 | `config.js`의 `primaryColor` (Docker: `PRIMARY_COLOR`) — 또는 빌드 시 `VITE_PRIMARY_COLOR` (기본 `#4188f1`) |
 | 앱 이름 (PWA 매니페스트) | 빌드 시 | `VITE_SITE_NAME` (기본 `MediaBBS`) |
@@ -123,6 +127,44 @@ VITE_PRIMARY_COLOR=#2e7d32
 VITE_SITE_NAME=예시 위키 게시판
 VITE_DEFAULT_SKIN=liberty
 ```
+
+### 상단 메뉴
+
+각 스킨에는 기본 메뉴가 있습니다.
+
+| 스킨 | 기본 메뉴 |
+|---|---|
+| `simple` | 게시판 ▾ / 위키 / 최근 바뀜 / (NAV_LINKS) |
+| `liberty` | 최근 바뀜 / 임의 문서 / 게시판 ▾ / 도구 ▾ / (NAV_LINKS) — Liberty 위키 스킨과 같은 구성 |
+
+`config.js`의 `menus`로 스킨마다 바꿀 수 있습니다. 키는 스킨 이름이며, `default`는 따로 정하지 않은
+모든 스킨에 적용됩니다.
+
+```js
+menus: {
+  simple: [{ type: "boards" }, { type: "wiki" }],
+  liberty: [
+    { type: "recentChanges" },
+    { type: "boards", label: { ko: "토론방", en: "Forums" } },
+    { label: "도움말", icon: "question", url: "https://wiki.example.org/wiki/Help:Contents" },
+    { label: "링크", children: [{ label: "지도", url: "https://maps.example.org" }] },
+  ],
+},
+```
+
+| 항목 | 내용 |
+|---|---|
+| `{ type: "recentChanges" }` | 위키의 최근 바뀜 |
+| `{ type: "random" }` | 위키의 임의 문서 |
+| `{ type: "boards" }` | 게시판 목록 드롭다운 |
+| `{ type: "tools" }` | 도구 드롭다운 (파일 업로드, 특수 문서 목록) |
+| `{ type: "wiki" }` | 위키 대문 |
+| `{ type: "navLinks" }` | 백엔드 `NAV_LINKS`의 항목들을 이 자리에 |
+| `{ label, url }` / `{ label, children: [{ label, url }] }` | 직접 만든 링크 / 드롭다운 |
+
+기본 항목도 `label`, `icon`을 바꿀 수 있습니다. `label`은 문자열이나 언어별 객체(`{ ko, en }`),
+`icon`은 Font Awesome 아이콘 이름(`fa-` 제외)이며 아이콘을 쓰지 않는 스킨(`simple`)에서는 무시됩니다.
+백엔드 `NAV_LINKS`는 모든 스킨에 공통이고, `menus`는 스킨별 구성입니다.
 
 ## 꾸미기
 

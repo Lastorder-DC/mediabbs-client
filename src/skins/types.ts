@@ -1,5 +1,6 @@
 import type { App, Component } from "vue";
 import type { LocaleCode } from "@/i18n";
+import type { MenuItemConfig } from "@/menu";
 
 /**
  * A skin supplies the whole look of the board: the page chrome (layout) and the
@@ -16,6 +17,8 @@ export interface Skin {
     /** `/:boardName/:topicId` */
     topic: Component;
   };
+  /** Default navigation menu (config.js `menus` can replace it per skin). */
+  menu: MenuItemConfig[];
   /** Register plugins/global components (e.g. a UI library) before mounting. */
   install?: (app: App) => void;
   /** Extra translations used by the skin's templates. */

@@ -8,11 +8,15 @@ import { useWikiSearch } from "@/composables/useWikiSearch";
 import { availableLocales, currentLocale, setLocale } from "@/i18n";
 import type { LocaleCode } from "@/i18n";
 import { availableSkins, currentSkinName, setSkin } from "@/skins";
+import { useMenu } from "@/composables/useMenu";
+import SimpleMenu from "./SimpleMenu.vue";
+import { defaultMenu } from "./menu";
 
 const { t } = useI18n();
 const store = useAppStore();
 const session = useSession();
-const { user, boards } = session;
+const { user } = session;
+const menu = useMenu(defaultMenu);
 const search = useWikiSearch();
 const board = computed(() => store.board);
 const locales = availableLocales();
@@ -28,11 +32,7 @@ useHead({
     <header class="s-header">
       <div class="s-wrap s-header-row">
         <RouterLink to="/" class="s-brand">{{ session.siteName }}</RouterLink>
-        <nav class="s-boards">
-          <RouterLink v-for="b in boards" :key="b.id" :to="`/${b.name}`">{{ b.displayName }}</RouterLink>
-          <a :href="session.wikiHome">{{ session.wikiName }}</a>
-          <a :href="session.special('RecentChanges')">{{ t("nav.recentChanges") }}</a>
-        </nav>
+        <SimpleMenu class="s-boards" :entries="menu" />
         <form class="s-search" @submit.prevent="search.go()">
           <input
             v-model="search.query.value"

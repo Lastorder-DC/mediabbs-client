@@ -4,11 +4,13 @@ import type { Skin } from "../types";
 import Layout from "./Layout.vue";
 import TopicList from "./pages/TopicList.vue";
 import Topic from "./pages/Topic.vue";
+import { defaultMenu } from "./menu";
 import "./style.css";
 
 const skin: Skin = {
   layout: Layout,
   pages: { topicList: TopicList, topic: Topic },
+  menu: defaultMenu,
 };
 
 export default skin;

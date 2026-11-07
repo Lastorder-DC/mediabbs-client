@@ -5,6 +5,7 @@
 //    synchronously.
 import axios from "axios";
 import { shallowRef } from "vue";
+import type { MenuItemConfig } from "@/menu";
 
 export interface NavLink {
   label: string;
@@ -57,6 +58,8 @@ export interface RuntimeConfig {
   skins?: string[];
   /** Theme color (hex). */
   primaryColor?: string;
+  /** Navigation menu per skin name (or `default`), replacing the skin's own. */
+  menus?: Record<string, MenuItemConfig[]>;
 }
 
 declare global {
