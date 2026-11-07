@@ -6,8 +6,12 @@ import type { Ref } from "vue";
  * returns whether more items may exist; when it returns false loading stops
  * until `resume()` (keep the list, check again) or `reset()` (caller cleared
  * the list).
+ *
+ * `loadMore` gets `isCurrent()`: after awaiting, it must check it before adding
+ * items, because a `reset()` may have happened meanwhile (the result then
+ * belongs to the old list and has to be dropped).
  */
-export function useInfiniteScroll(loadMore: () => Promise<boolean>) {
+export function useInfiniteScroll(loadMore: (isCurrent: () => boolean) => Promise<boolean>) {
   const sentinel: Ref<HTMLElement | null> = ref(null);
   const loading = ref(false);
   const done = ref(false);
@@ -31,7 +35,7 @@ export function useInfiniteScroll(loadMore: () => Promise<boolean>) {
     failed.value = false;
     const gen = generation;
     try {
-      const more = await loadMore();
+      const more = await loadMore(() => gen === generation);
       if (gen !== generation) return;
       done.value = !more;
     } catch (error) {

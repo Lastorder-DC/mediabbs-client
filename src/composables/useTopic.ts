@@ -15,6 +15,7 @@ import type { Comment, Topic, TopicStatus } from "@/api";
 import { t } from "@/i18n";
 import { useAppStore } from "@/stores/app";
 import { useInfiniteScroll } from "./useInfiniteScroll";
+import { appendUnique } from "./appendUnique";
 import { markVisited } from "./visits";
 import { commentSubmitter } from "./commentSubmitter";
 
@@ -32,11 +33,11 @@ export function useTopic() {
   const topicId = computed(() => Number(route.params.topicId));
   let pollTimer: number | undefined;
 
-  const scroll = useInfiniteScroll(async () => {
+  const scroll = useInfiniteScroll(async (isCurrent) => {
     const id = topicId.value;
     const page = await getComments(id, comments.value.length, PAGE_SIZE);
-    if (id !== topicId.value) return true;
-    comments.value.push(...page);
+    if (!isCurrent() || id !== topicId.value) return true;
+    appendUnique(comments.value, page);
     const more = page.length === PAGE_SIZE;
     if (!more) {
       window.clearTimeout(pollTimer);
@@ -87,7 +88,7 @@ export function useTopic() {
     for (;;) {
       const page = await getComments(id, comments.value.length, PAGE_SIZE);
       if (id !== topicId.value) return;
-      comments.value.push(...page);
+      appendUnique(comments.value, page);
       if (page.length < PAGE_SIZE) return;
     }
   }
