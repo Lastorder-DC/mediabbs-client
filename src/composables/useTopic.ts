@@ -19,9 +19,13 @@ import { useInfiniteScroll } from "./useInfiniteScroll";
 import { appendUnique } from "./appendUnique";
 import { markVisited } from "./visits";
 import { commentSubmitter } from "./commentSubmitter";
+import { useLiveTopic } from "./useLiveTopic";
 
 const PAGE_SIZE = 20;
-/** After reaching the end, check for new comments this often. */
+/**
+ * After reaching the end, check for new comments this often — only while live
+ * updates (Server-Sent Events, useLiveTopic) are not connected.
+ */
 const POLL_MS = 10_000;
 
 /** A topic page: the topic, its comments and the moderation actions. */
@@ -40,12 +44,14 @@ export function useTopic() {
     if (!isCurrent() || id !== topicId.value) return true;
     appendUnique(comments.value, page);
     const more = page.length === PAGE_SIZE;
-    if (!more) {
-      window.clearTimeout(pollTimer);
-      pollTimer = window.setTimeout(() => scroll.resume(), POLL_MS);
-    }
+    if (!more) schedulePoll();
     return more;
   });
+
+  function schedulePoll(): void {
+    window.clearTimeout(pollTimer);
+    if (!live.value) pollTimer = window.setTimeout(() => scroll.resume(), POLL_MS);
+  }
 
   const writeBlockReason = computed((): string | null => {
     if (!topic.value) return null;
@@ -66,6 +72,41 @@ export function useTopic() {
     (can) => (store.canWrite = can),
     { immediate: true },
   );
+
+  /** Reloads a comment that changed (e.g. was hidden), if it is shown. */
+  async function refreshComment(id: number): Promise<void> {
+    const index = comments.value.findIndex((c) => c.id === id);
+    if (index < 0) return;
+    try {
+      const fresh = await getComment(id, store.user.isAdmin);
+      const now = comments.value.findIndex((c) => c.id === id);
+      if (now >= 0) comments.value[now] = fresh;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /** New comments go to the end: load them only if the end is shown. */
+  function onNewComments(): void {
+    if (scroll.done.value && !scroll.loading.value) {
+      loadNewComments().catch((error) => console.error(error));
+    }
+  }
+
+  const { live } = useLiveTopic(topicId, {
+    comment: onNewComments,
+    commentUpdated: (id) => void refreshComment(id),
+    topic: () => void fetchTopic(),
+    resync: () => {
+      void fetchTopic();
+      onNewComments();
+    },
+  });
+  // Connected: no polling. Disconnected for good: poll again (if at the end).
+  watch(live, (isLive) => {
+    if (isLive) window.clearTimeout(pollTimer);
+    else if (scroll.done.value) schedulePoll();
+  });
 
   async function fetchTopic(): Promise<void> {
     try {
@@ -137,6 +178,8 @@ export function useTopic() {
   return {
     topic,
     comments,
+    /** Whether live updates are connected. */
+    live,
     ...scroll,
     writeBlockReason,
     title: computed(() => (topic.value ? decode(topic.value.title) : "")),

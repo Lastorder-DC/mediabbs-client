@@ -71,7 +71,7 @@ interface Skin {
 |---|---|
 | `useSession()` | 로그인 상태(`user`), 게시판 목록(`boards`), `NAV_LINKS`, 위키 이름·주소·로고, `login()`/`logout()`, 위키 링크 함수 |
 | `useTopicList()` | 현재 게시판의 주제 목록과 무한 스크롤(`sentinel` ref를 목록 끝 요소에 연결), 제목·갱신 시각 문자열, "마지막 방문 이후 바뀜" |
-| `useTopic()` | 주제와 의견 목록(무한 스크롤, 10초마다 새 의견 확인), 관리 동작(`moderate({ isPinned: true })` 등), 의견 숨기기, `submitComment()`, `quote()`, 쓰기 불가 사유(`writeBlockReason`) |
+| `useTopic()` | 주제와 의견 목록(무한 스크롤, 새 의견·숨김·주제 상태를 실시간으로 반영 — 연결이 안 되면 목록 끝에서 10초마다 확인, 연결 상태는 `live`), 관리 동작(`moderate({ isPinned: true })` 등), 의견 숨기기, `submitComment()`, `quote()`, 쓰기 불가 사유(`writeBlockReason`) |
 | `useLiveRecent()` | 위키 최근 바뀜/최근 토론 패널 데이터 (30초마다 갱신) |
 | `useSiteNotice()` | 위키 사이트 공지 HTML과 링크 보정 함수 |
 | `useWikiSearch()` | 위키 검색어, 제목 추천, `go()`/`search()` |
