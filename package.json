@@ -18,6 +18,7 @@
     "@toast-ui/editor": "^3",
     "@unhead/vue": "^3",
     "axios": "^1",
+    "bootstrap-icons": "^1",
     "buefy": "^3",
     "bulma": "^1",
     "html-entities": "^2",

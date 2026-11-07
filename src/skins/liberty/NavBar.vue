@@ -38,10 +38,17 @@ const logoFailed = ref(false);
                   <b-icon class="navbar-caret" icon="caret-down" />
                 </a>
               </template>
-              <b-dropdown-item v-for="child in entry.children" :key="child.key" has-link>
-                <RouterLink v-if="child.to" :to="child.to">{{ child.label }}</RouterLink>
-                <a v-else :href="child.href">{{ child.label }}</a>
-              </b-dropdown-item>
+              <template v-for="child in entry.children" :key="child.key">
+                <hr v-if="child.separator" class="dropdown-divider" />
+                <b-dropdown-item has-link>
+                  <RouterLink v-if="child.to" :to="child.to">
+                    <i v-if="child.iconClass" :class="child.iconClass" class="menu-item-icon" aria-hidden="true" />{{ child.label }}
+                  </RouterLink>
+                  <a v-else :href="child.href">
+                    <i v-if="child.iconClass" :class="child.iconClass" class="menu-item-icon" aria-hidden="true" />{{ child.label }}
+                  </a>
+                </b-dropdown-item>
+              </template>
             </b-dropdown>
             <a v-else class="navbar-item" :href="entry.href" :title="entry.label">
               <b-icon v-if="entry.icon" :icon="entry.icon" />
@@ -72,6 +79,9 @@ const logoFailed = ref(false);
               <hr class="dropdown-divider" />
               <b-dropdown-item has-link>
                 <a :href="special('Preferences')">{{ t("nav.preferences") }}</a>
+              </b-dropdown-item>
+              <b-dropdown-item v-if="user.isAdmin" has-link>
+                <RouterLink to="/admin">{{ t("admin.page") }}</RouterLink>
               </b-dropdown-item>
               <hr class="dropdown-divider" />
               <b-dropdown-item @click="session.logout">{{ t("nav.logout") }}</b-dropdown-item>
@@ -197,6 +207,15 @@ const logoFailed = ref(false);
 }
 .liberty-navbar .dropdown-content a {
   color: var(--liberty-text);
+}
+.liberty-navbar .dropdown-content .dropdown-divider {
+  margin: 0.25rem 0;
+}
+.liberty-navbar .menu-item-icon {
+  display: inline-block;
+  width: 1.25em;
+  margin-right: 0.35rem;
+  text-align: center;
 }
 /* Search box: 2rem high, 0.8rem text, like the wiki's form-inline. */
 .liberty-navbar .search-box-wrapper {

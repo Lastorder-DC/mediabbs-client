@@ -2813,6 +2813,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bootstrap-icons@npm:^1":
+  version: 1.13.2
+  resolution: "bootstrap-icons@npm:1.13.2"
+  checksum: 10c0/865f6e036836432cbbf7587406a2822674bcb79d4e5f454c081d6c664ee3b429ec9e5807851be6245a2059be32055790a6e23cceacc1badd38d2d271aff9c77b
+  languageName: node
+  linkType: hard
+
 "brace-expansion@npm:^2.0.1":
   version: 2.1.7
   resolution: "brace-expansion@npm:2.1.7"
@@ -4698,6 +4705,7 @@ __metadata:
     "@vue/eslint-config-prettier": "npm:^10"
     "@vue/eslint-config-typescript": "npm:^14"
     axios: "npm:^1"
+    bootstrap-icons: "npm:^1"
     buefy: "npm:^3"
     bulma: "npm:^1"
     eslint: "npm:^10"

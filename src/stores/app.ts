@@ -21,14 +21,28 @@ const anonymous = (): UserState => ({
   username: "",
 });
 
-const emptyBoard = (): Board => ({
+export const emptyBoard = (): Board => ({
   id: 0,
   displayName: "",
   name: "",
   isActive: false,
+  sortOrder: 0,
+  icon: null,
+  writePermission: "all",
+  commentPermission: "all",
+  isListed: false,
+  separatorBefore: false,
   createdAt: "",
   updatedAt: "",
 });
+
+/** Loads the Bootstrap Icons font once some board uses an icon. */
+let iconsRequested = false;
+export function loadBoardIcons(): void {
+  if (iconsRequested) return;
+  iconsRequested = true;
+  import("bootstrap-icons/font/bootstrap-icons.min.css").catch((error) => console.error(error));
+}
 
 export type EditorKind = "topic" | "comment";
 
@@ -83,9 +97,21 @@ export const useAppStore = defineStore("app", {
     },
     async fetchBoards(): Promise<Board[]> {
       if (!this.boards) {
-        this.boards = await getBoards();
+        this.setBoards(await getBoards());
       }
-      return this.boards;
+      return this.boards ?? [];
+    },
+    /** Replaces the board list (also after admin changes) and the current board. */
+    setBoards(boards: Board[]) {
+      this.boards = boards;
+      if (boards.some((b) => b.icon)) loadBoardIcons();
+      if (this.board.id) {
+        const current = boards.find((b) => b.id === this.board.id);
+        if (current) this.board = current;
+      }
+    },
+    clearBoard() {
+      if (this.board.id) this.board = emptyBoard();
     },
     async fetchBoard(name: string) {
       const boards = await this.fetchBoards();

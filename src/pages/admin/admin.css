@@ -1,0 +1,314 @@
+/* Admin page: skin-independent styles. Colors follow the skin when it defines
+   them (Liberty: Bulma variables, Simple: --primary/--border/...). */
+.mb-admin {
+  --mb-primary: var(--bulma-primary, var(--primary, #4188f1));
+  --mb-border: var(--liberty-border, var(--border, #d0d7de));
+  --mb-muted: var(--muted, #6b7280);
+  --mb-surface: var(--surface, #fff);
+  --mb-subtle: var(--background, #f6f8fa);
+  --mb-danger: #c62828;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.mb-admin h2.mb-admin-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+}
+.mb-admin h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+}
+.mb-admin ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mb-admin .mb-muted {
+  color: var(--mb-muted);
+  font-size: 0.85em;
+}
+.mb-admin .mb-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--mb-border);
+  margin-bottom: 1rem;
+}
+.mb-admin .mb-tab {
+  font: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0.45rem 0.9rem;
+  margin-bottom: -1px;
+  cursor: pointer;
+  color: inherit;
+}
+.mb-admin .mb-tab.active {
+  border-bottom-color: var(--mb-primary);
+  color: var(--mb-primary);
+  font-weight: 700;
+}
+.mb-admin .mb-btn {
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  border: 1px solid var(--mb-border);
+  background: var(--mb-surface);
+  color: inherit;
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mb-admin .mb-btn:hover:not(:disabled) {
+  border-color: var(--mb-primary);
+}
+.mb-admin .mb-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.mb-admin .mb-btn.small {
+  padding: 0.1rem 0.5rem;
+}
+.mb-admin .mb-btn.primary {
+  background: var(--mb-primary);
+  border-color: var(--mb-primary);
+  color: #fff;
+}
+.mb-admin .mb-btn.danger {
+  color: var(--mb-danger);
+}
+.mb-admin .mb-input {
+  font: inherit;
+  font-size: 0.9rem;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--mb-border);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  background: var(--mb-surface);
+  color: inherit;
+  box-sizing: border-box;
+}
+.mb-admin .mb-input[aria-invalid="true"] {
+  border-color: var(--mb-danger);
+}
+.mb-admin .mb-admin-note {
+  padding: 1rem 0;
+}
+.mb-admin .mb-admin-hint {
+  color: var(--mb-muted);
+  font-size: 0.85rem;
+  margin: 0 0 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mb-admin .mb-admin-message {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: #e8f5e9;
+  margin: 0 0 0.8rem;
+}
+.mb-admin .mb-admin-message.error {
+  background: #fdecea;
+  color: var(--mb-danger);
+}
+.mb-admin .mb-admin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.6rem 0;
+  border-radius: 4px;
+  background: #fff8e1;
+}
+/* Board list */
+.mb-admin .mb-board-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--mb-border);
+  border-radius: 4px;
+  margin-bottom: 0.35rem;
+  background: var(--mb-surface);
+}
+.mb-admin .mb-board-row.separator {
+  margin-top: 1rem;
+  position: relative;
+}
+.mb-admin .mb-board-row.separator::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.6rem;
+  border-top: 2px dashed var(--mb-border);
+}
+.mb-admin .mb-board-row.dragging {
+  opacity: 0.5;
+}
+.mb-admin .mb-handle {
+  cursor: grab;
+  color: var(--mb-muted);
+  letter-spacing: -0.2em;
+  user-select: none;
+}
+.mb-admin .mb-board-name {
+  flex: 1 1 12rem;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.mb-admin .mb-board-icon {
+  width: 1.2em;
+  text-align: center;
+}
+.mb-admin .mb-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.mb-admin .mb-badge {
+  font-size: 0.75rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: var(--mb-subtle);
+  border: 1px solid var(--mb-border);
+  color: var(--mb-muted);
+}
+.mb-admin .mb-row-actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+/* Forms */
+.mb-admin .mb-board-form {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--mb-border);
+  border-radius: 4px;
+  background: var(--mb-subtle);
+}
+.mb-admin .mb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.75rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+.mb-admin .mb-field.narrow {
+  flex: 0 1 10rem;
+}
+.mb-admin .mb-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  align-items: flex-end;
+}
+.mb-admin .mb-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.mb-admin .mb-help {
+  color: var(--mb-muted);
+  font-size: 0.8rem;
+}
+.mb-admin .mb-help.error {
+  color: var(--mb-danger);
+}
+.mb-admin .mb-check {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+.mb-admin .mb-icon-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mb-admin .mb-icon-preview {
+  flex: 0 0 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--mb-border);
+  border-radius: 4px;
+  background: var(--mb-surface);
+  font-size: 1.1rem;
+}
+.mb-admin .mb-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.mb-admin .mb-form-actions .danger {
+  margin-left: auto;
+}
+/* Menu editor */
+.mb-admin .mb-menu-mode {
+  margin-bottom: 0.75rem;
+}
+.mb-admin .mb-json {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+.mb-admin .mb-menu-item {
+  border: 1px solid var(--mb-border);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem 0;
+  margin-bottom: 0.5rem;
+  background: var(--mb-surface);
+}
+.mb-admin .mb-menu-item-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.mb-admin .mb-menu-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+  align-items: flex-end;
+}
+.mb-admin .mb-menu-fields > .mb-row-actions {
+  margin-bottom: 0.75rem;
+}
+.mb-admin .mb-menu-children {
+  margin: 0 0 0.6rem 1rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--mb-border);
+}
+.mb-admin .mb-text-langs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.mb-admin .mb-text-lang {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.mb-admin .mb-menu-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.mb-admin .mb-menu-add select {
+  width: auto;
+}

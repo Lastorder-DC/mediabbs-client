@@ -39,7 +39,7 @@ interface Skin {
     topicList: Component;               // /:boardName
     topic: Component;                   // /:boardName/:topicId
   };
-  menu: MenuItemConfig[];               // 기본 상단 메뉴 (config.js `menus`로 바꿀 수 있음)
+  menu: MenuItemConfig[];               // 기본 상단 메뉴 (관리 페이지나 config.js `menus`로 바꿀 수 있음)
   install?: (app: App) => void;         // UI 라이브러리 등록 등 (마운트 전에 호출)
   messages?: { ko?: {...}; en?: {...} }; // 스킨 전용 번역 (선택)
 }
@@ -51,9 +51,13 @@ interface Skin {
 2. `src/skins/index.ts`의 `SKINS`에 등록합니다.
    ```ts
    export const SKINS = {
-     liberty: { label: "Liberty", load: () => import("./liberty") },
-     simple: { label: "Simple", load: () => import("./simple") },
-     mytheme: { label: "My theme", load: () => import("./mytheme") },
+     // …
+     mytheme: {
+       label: "My theme",
+       load: () => import("./mytheme"),
+       // 관리 페이지의 메뉴 편집기가 기본 메뉴를 보여 줄 때 씁니다(스킨 CSS 없이).
+       menu: () => import("./mytheme/menu").then((m) => m.defaultMenu),
+     },
    };
    ```
 3. `yarn dev`로 띄우고 화면 아래의 스킨 선택에서 고르거나, `config.js`에 `skin: "mytheme"`을 넣습니다.
@@ -71,7 +75,7 @@ interface Skin {
 | `useLiveRecent()` | 위키 최근 바뀜/최근 토론 패널 데이터 (30초마다 갱신) |
 | `useSiteNotice()` | 위키 사이트 공지 HTML과 링크 보정 함수 |
 | `useWikiSearch()` | 위키 검색어, 제목 추천, `go()`/`search()` |
-| `useMenu(defaultMenu)` | 상단 메뉴. config.js `menus[스킨]` → `menus.default` → 스킨 기본값 순으로 골라, `{ label, icon, href/to, children }` 목록으로 풀어 줍니다 (`to`는 게시판 RouterLink용) |
+| `useMenu(defaultMenu)` | 상단 메뉴. 관리 페이지에 저장된 메뉴 → config.js `menus` → 스킨 기본값 순으로 골라(각각 스킨 → `default`), `{ label, icon, href/to, children }` 목록으로 풀어 줍니다 (`to`는 게시판 RouterLink용). 하위 항목의 `iconClass`(게시판 아이콘, `bi bi-…`)와 `separator`(위에 구분선)도 그려 주세요 |
 
 공용 컴포넌트:
 
@@ -105,7 +109,10 @@ const menu = useMenu(defaultMenu);
 <template v-for="entry in menu" :key="entry.key">
   <MyDropdown v-if="entry.children" :label="entry.label">
     <template v-for="child in entry.children" :key="child.key">
-      <RouterLink v-if="child.to" :to="child.to">{{ child.label }}</RouterLink>
+      <hr v-if="child.separator" />
+      <RouterLink v-if="child.to" :to="child.to">
+        <i v-if="child.iconClass" :class="child.iconClass" />{{ child.label }}
+      </RouterLink>
       <a v-else :href="child.href">{{ child.label }}</a>
     </template>
   </MyDropdown>
@@ -113,7 +120,10 @@ const menu = useMenu(defaultMenu);
 </template>
 ```
 
-운영자는 스킨 코드를 고치지 않고 `config.js`의 `menus`로 메뉴를 바꿀 수 있습니다(README 참고).
+운영자는 스킨 코드를 고치지 않고 관리 페이지나 `config.js`의 `menus`로 메뉴를 바꿀 수 있습니다(README 참고).
+게시판 제목 옆에 아이콘을 보이려면 `boardIconClass(store.board.icon)`(`@/menu`)을 쓰세요.
+
+관리 페이지(`/admin`)는 스킨과 무관한 공용 페이지로, 스킨의 레이아웃 안 `<RouterView />` 자리에 그려집니다.
 
 ## 번역
 

@@ -42,8 +42,13 @@ onBeforeUnmount(() => {
         </button>
         <div v-show="open === entry.key" class="s-menu-panel" role="menu">
           <template v-for="child in entry.children" :key="child.key">
-            <RouterLink v-if="child.to" :to="child.to" role="menuitem">{{ child.label }}</RouterLink>
-            <a v-else :href="child.href" role="menuitem">{{ child.label }}</a>
+            <hr v-if="child.separator" class="s-menu-separator" role="separator" />
+            <RouterLink v-if="child.to" :to="child.to" role="menuitem">
+              <i v-if="child.iconClass" :class="child.iconClass" class="s-menu-icon" aria-hidden="true" />{{ child.label }}
+            </RouterLink>
+            <a v-else :href="child.href" role="menuitem">
+              <i v-if="child.iconClass" :class="child.iconClass" class="s-menu-icon" aria-hidden="true" />{{ child.label }}
+            </a>
           </template>
         </div>
       </div>
@@ -96,6 +101,17 @@ onBeforeUnmount(() => {
   padding: 0.35rem 0.9rem;
   color: var(--text);
   white-space: nowrap;
+}
+.s-menu-separator {
+  margin: 0.3rem 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+.s-menu-icon {
+  display: inline-block;
+  width: 1.25em;
+  margin-right: 0.4rem;
+  text-align: center;
 }
 .s-menu-panel a:hover,
 .s-menu-panel a.router-link-active {

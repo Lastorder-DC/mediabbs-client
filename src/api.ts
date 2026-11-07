@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { refreshToken } from "@/auth";
 import { backendHost } from "@/config";
+import type { MenuConfigs } from "@/menu";
 import { t, translateServerError } from "@/i18n";
 
 const client = axios.create({
@@ -52,13 +53,38 @@ export interface UserInfo {
   isAdmin: boolean;
 }
 
+/** Who may write in a board: everyone, logged-in users, or admins. */
+export type Permission = "all" | "users" | "admins";
+
 export interface Board {
   id: number;
   displayName: string;
   name: string;
+  /** `false`: archived (read-only). */
   isActive: boolean;
+  sortOrder: number;
+  /** Bootstrap Icons name shown before the board name (`chat-dots`). */
+  icon: string | null;
+  /** Who may start topics. */
+  writePermission: Permission;
+  /** Who may add comments. */
+  commentPermission: Permission;
+  /** Shown in the boards menu. Unlisted boards are still reachable by URL. */
+  isListed: boolean;
+  /** Draw a separator above the board in the boards menu. */
+  separatorBefore: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Whether a user may write under `permission`. */
+export function permits(
+  permission: Permission,
+  user: { isLoggedIn: boolean; isAdmin: boolean },
+): boolean {
+  if (permission === "users") return user.isLoggedIn;
+  if (permission === "admins") return user.isLoggedIn && user.isAdmin;
+  return true;
 }
 
 export interface Topic {
@@ -97,6 +123,16 @@ export async function getUserInfo(): Promise<UserInfo> {
 
 export async function getBoards(): Promise<Board[]> {
   return (await client.get<Board[]>("/boards")).data;
+}
+
+/**
+ * Boards fresh from the server. Also refreshes the browser's cached copy, so
+ * a reload after an admin change does not show the old list.
+ */
+export async function getBoardsUncached(): Promise<Board[]> {
+  const response = await fetch(`${backendHost}/boards`, { cache: "reload" });
+  if (!response.ok) throw new Error(await response.text());
+  return (await response.json()) as Board[];
 }
 
 export async function getTopics(boardId: number, offset: number, limit: number): Promise<Topic[]> {
@@ -146,4 +182,40 @@ export interface FileResponse {
 
 export async function postFile(filename: string, content: string): Promise<FileResponse> {
   return (await client.post<FileResponse>("/files", { filename, content })).data;
+}
+
+// Admin (board administrators only)
+
+export type BoardSettings = Pick<
+  Board,
+  | "name"
+  | "displayName"
+  | "icon"
+  | "writePermission"
+  | "commentPermission"
+  | "isListed"
+  | "isActive"
+  | "separatorBefore"
+>;
+
+export async function createBoard(settings: BoardSettings): Promise<Board> {
+  return (await client.post<Board>("/admin/boards", settings)).data;
+}
+
+export async function updateBoard(id: number, settings: BoardSettings): Promise<Board> {
+  return (await client.put<Board>(`/admin/boards/${id}`, settings)).data;
+}
+
+export async function deleteBoard(id: number): Promise<void> {
+  await client.delete(`/admin/boards/${id}`);
+}
+
+/** Sets the menu order; `ids` lists every board. Returns the boards in order. */
+export async function reorderBoards(ids: number[]): Promise<Board[]> {
+  return (await client.put<Board[]>("/admin/boards-order", { ids })).data;
+}
+
+/** Saves the menus (`null` removes them: config.js / skin defaults apply). */
+export async function saveMenus(menus: MenuConfigs | null): Promise<void> {
+  await client.put("/admin/menus", { menus });
 }

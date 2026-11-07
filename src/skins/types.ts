@@ -30,4 +30,6 @@ export interface SkinEntry {
   label: string;
   /** Lazily loads the skin (its code and CSS are only fetched when used). */
   load: () => Promise<{ default: Skin }>;
+  /** Loads only the skin's default menu (for the admin page; no CSS). */
+  menu: () => Promise<MenuItemConfig[]>;
 }

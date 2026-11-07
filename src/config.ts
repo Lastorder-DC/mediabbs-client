@@ -4,8 +4,8 @@
 //    before the app is mounted (see main.ts) so components can read them
 //    synchronously.
 import axios from "axios";
-import { shallowRef } from "vue";
-import type { MenuItemConfig } from "@/menu";
+import { ref, shallowRef } from "vue";
+import type { MenuConfigs, MenuItemConfig } from "@/menu";
 
 export interface NavLink {
   label: string;
@@ -47,6 +47,8 @@ export interface PublicConfig {
     maxBytes: number;
     allowedExtensions: string[];
   };
+  /** Menus saved from the admin page (`null`: none). */
+  menus: MenuConfigs | null;
 }
 
 /** Settings from public/config.js. */
@@ -79,10 +81,19 @@ export const backendHost: string = (
 
 const state = shallowRef<PublicConfig | null>(null);
 
+/** Menus saved from the admin page; updated in place when an admin saves. */
+export const serverMenus = ref<MenuConfigs | null>(null);
+
 export async function loadConfig(): Promise<PublicConfig> {
   const { data } = await axios.get<PublicConfig>(`${backendHost}/config`);
   state.value = data;
+  serverMenus.value = data.menus ?? null;
   return data;
+}
+
+/** Refreshes the browser's cached `/config` (after an admin change). */
+export async function refreshConfigCache(): Promise<void> {
+  await fetch(`${backendHost}/config`, { cache: "reload" }).catch(() => undefined);
 }
 
 /** The loaded configuration. Only valid after `loadConfig()` resolved. */

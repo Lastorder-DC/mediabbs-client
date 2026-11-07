@@ -1,29 +1,44 @@
 import { computed } from "vue";
 import type { ComputedRef } from "vue";
 import { useI18n } from "vue-i18n";
-import { getConfig, runtimeConfig } from "@/config";
+import { getConfig, runtimeConfig, serverMenus } from "@/config";
 import type { NavLink } from "@/config";
-import { BUILTIN_ICONS, isBuiltin } from "@/menu";
+import { BUILTIN_ICONS, boardIconClass, isBuiltin } from "@/menu";
 import type { MenuEntry, MenuItemConfig, MenuLink, MenuText } from "@/menu";
 import { currentSkinName } from "@/skins";
 import { useAppStore } from "@/stores/app";
 import { specialUrl } from "@/wiki";
 
+/** Where a skin's menu comes from, highest priority first. */
+export type MenuSource = "admin" | "adminDefault" | "config" | "configDefault" | "skin";
+
+/** The configured menu of `skin` and where it comes from. */
+export function menuItemsFor(
+  skin: string,
+  skinDefault: MenuItemConfig[],
+): { items: MenuItemConfig[]; source: MenuSource } {
+  const saved = serverMenus.value;
+  const deployed = runtimeConfig.menus;
+  if (saved?.[skin]) return { items: saved[skin], source: "admin" };
+  if (saved?.default) return { items: saved.default, source: "adminDefault" };
+  if (deployed?.[skin]) return { items: deployed[skin], source: "config" };
+  if (deployed?.default) return { items: deployed.default, source: "configDefault" };
+  return { items: skinDefault, source: "skin" };
+}
+
 /**
  * The navigation menu of the current skin, resolved to links and dropdowns:
- * config.js `menus[<skin>]`, else `menus.default`, else the skin's own default.
+ * menus saved from the admin page (this skin's, else `default`), then config.js
+ * `menus` (likewise), else the skin's own default.
  */
 export function useMenu(skinDefault: MenuItemConfig[]): ComputedRef<MenuEntry[]> {
   const { t, locale } = useI18n();
   const store = useAppStore();
   const config = getConfig();
-  const menus = runtimeConfig.menus;
-  const items: MenuItemConfig[] =
-    menus?.[currentSkinName()] ?? menus?.default ?? skinDefault;
-
-  if (!store.boards && items.some((i) => isBuiltin(i) && i.type === "boards")) {
-    store.fetchBoards().catch((error) => console.error(error));
-  }
+  const skin = currentSkinName();
+  // The router guard loads the boards on every navigation; this covers pages
+  // without a board (e.g. /auth).
+  if (!store.boards) store.fetchBoards().catch((error) => console.error(error));
 
   function text(value: MenuText | undefined, fallback: string): string {
     if (value === undefined) return fallback;
@@ -42,6 +57,7 @@ export function useMenu(skinDefault: MenuItemConfig[]): ComputedRef<MenuEntry[]>
   });
 
   return computed(() => {
+    const items = menuItemsFor(skin, skinDefault).items;
     const result: MenuEntry[] = [];
     items.forEach((item, index) => {
       const key = `menu-${index}`;
@@ -69,13 +85,20 @@ export function useMenu(skinDefault: MenuItemConfig[]): ComputedRef<MenuEntry[]>
           result.push({ key, icon, label: text(item.label, t("nav.wiki")), href: config.wiki.baseUrl });
           break;
         case "boards": {
-          const boards = store.boards || [];
+          const boards = (store.boards || []).filter((b) => b.isListed);
           if (boards.length) {
             result.push({
               key,
               icon,
               label: text(item.label, t("nav.boards")),
-              children: boards.map((b) => ({ key: `${key}-${b.id}`, label: b.displayName, to: `/${b.name}` })),
+              children: boards.map((b, i) => ({
+                key: `${key}-${b.id}`,
+                label: b.displayName,
+                iconClass: boardIconClass(b.icon),
+                // No separator above the first item.
+                separator: i > 0 && b.separatorBefore,
+                to: `/${b.name}`,
+              })),
             });
           }
           break;

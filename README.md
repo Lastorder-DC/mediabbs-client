@@ -137,8 +137,10 @@ VITE_DEFAULT_SKIN=liberty
 | `simple` | 게시판 ▾ / 위키 / 최근 바뀜 / (NAV_LINKS) |
 | `liberty` | 최근 바뀜 / 임의 문서 / 게시판 ▾ / 도구 ▾ / (NAV_LINKS) — Liberty 위키 스킨과 같은 구성 |
 
-`config.js`의 `menus`로 스킨마다 바꿀 수 있습니다. 키는 스킨 이름이며, `default`는 따로 정하지 않은
-모든 스킨에 적용됩니다.
+게시판 관리자는 **관리 페이지**(`/admin` → 메뉴 탭)에서 스킨마다 항목과 순서를 바꿀 수 있습니다
+(서버에 저장, [운영 안내](https://github.com/Lastorder-DC/mediabbs/blob/main/docs/administration.md#관리-페이지)).
+배포 설정으로 정하려면 `config.js`의 `menus`를 씁니다. 키는 스킨 이름이며, `default`는 따로 정하지 않은
+모든 스킨에 적용됩니다. 우선순위는 관리 페이지(스킨 → `default`) → `config.js`(스킨 → `default`) → 스킨 기본값입니다.
 
 ```js
 menus: {
@@ -156,7 +158,7 @@ menus: {
 |---|---|
 | `{ type: "recentChanges" }` | 위키의 최근 바뀜 |
 | `{ type: "random" }` | 위키의 임의 문서 |
-| `{ type: "boards" }` | 게시판 목록 드롭다운 |
+| `{ type: "boards" }` | 게시판 목록 드롭다운 (게시판 설정의 순서·메뉴 표시·아이콘·구분선대로) |
 | `{ type: "tools" }` | 도구 드롭다운 (파일 업로드, 특수 문서 목록) |
 | `{ type: "wiki" }` | 위키 대문 |
 | `{ type: "navLinks" }` | 백엔드 `NAV_LINKS`의 항목들을 이 자리에 |
@@ -165,6 +167,10 @@ menus: {
 기본 항목도 `label`, `icon`을 바꿀 수 있습니다. `label`은 문자열이나 언어별 객체(`{ ko, en }`),
 `icon`은 Font Awesome 아이콘 이름(`fa-` 제외)이며 아이콘을 쓰지 않는 스킨(`simple`)에서는 무시됩니다.
 백엔드 `NAV_LINKS`는 모든 스킨에 공통이고, `menus`는 스킨별 구성입니다.
+
+게시판 목록의 순서, 메뉴에 보일 게시판, 게시판 이름 왼쪽의 [Bootstrap Icons](https://icons.getbootstrap.com/)
+아이콘, 게시판 사이 구분선은 게시판 설정입니다. 관리 페이지의 게시판 탭이나 백엔드 CLI로 정합니다.
+아이콘 글꼴은 아이콘을 쓰는 게시판이 있을 때만 불러옵니다.
 
 ## 꾸미기
 
@@ -204,7 +210,7 @@ VITE_BACKEND_HOST=http://127.0.0.1:18081
 이때 백엔드의 `CORS_ALLOWED_ORIGINS`에 `http://localhost:5173`을 추가해야 합니다
 (`dev/docker-compose.yml`의 backend 환경 변수, 쉼표로 구분). 위키의 OAuth 콜백은 개발 환경의 클라이언트
 컨테이너(`http://127.0.0.1:18090/auth`)로 등록돼 있으므로, 로그인 흐름은 컨테이너 쪽에서 확인하세요.
-브라우저 테스트는 백엔드 저장소의 `dev/e2e`(`oauth-e2e.js`, `ui-e2e.js`)에 있습니다.
+브라우저 테스트는 백엔드 저장소의 `dev/e2e`(`oauth-e2e.js`, `ui-e2e.js`, `admin-e2e.js`)에 있습니다.
 
 ### 구조
 
@@ -217,12 +223,13 @@ src/
   wiki.ts           위키 링크·API 헬퍼 (정식 이름공간 이름 사용)
   upload.ts         편집기 이미지 업로드
   theme.ts          테마 색 (CSS 변수)
-  router.ts         라우팅 (/, /auth, /:boardName, /:boardName/:topicId)
+  router.ts         라우팅 (/, /auth, /admin, /:boardName, /:boardName/:topicId)
   i18n/             번역 (vue-i18n)
   stores/app.ts     공용 상태 (Pinia)
   composables/      스킨이 쓰는 동작 (주제 목록, 주제, 검색, 최근 바뀜 …)
   components/       공용 컴포넌트 (편집기, 마크다운 뷰어, Gravatar)
-  pages/            스킨 공용 페이지 (로그인 콜백)
+  menu.ts           상단 메뉴 형식 (MenuItemConfig → MenuEntry)
+  pages/            스킨 공용 페이지 (로그인 콜백, 관리 페이지 admin/)
   skins/            스킨 (liberty, simple) — docs/skins.md
 public/
   config.js         배포 시 바꾸는 런타임 설정

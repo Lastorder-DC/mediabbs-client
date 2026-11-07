@@ -7,6 +7,7 @@ import {
   getComment,
   getComments,
   getTopic,
+  permits,
   postComment,
   setCommentHidden,
   setTopicStatus,
@@ -52,6 +53,11 @@ export function useTopic() {
     if (topic.value.isSuspended) return t("topic.suspendedNotice");
     if (!store.board.isActive) return t("topic.archivedNotice");
     if (store.user.isBlocked) return t("topic.blockedNotice");
+    if (!permits(store.board.commentPermission, store.user)) {
+      return store.board.commentPermission === "users"
+        ? t("topic.loginToCommentNotice")
+        : t("topic.adminCommentNotice");
+    }
     return null;
   });
 

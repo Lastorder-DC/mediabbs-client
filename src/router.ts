@@ -12,7 +12,7 @@ export function createAppRouter(skin: Skin): Router {
     scrollBehavior: (to, from, saved) => saved || { top: 0 },
     routes: [
       {
-        // Default board: DEFAULT_BOARD, else the first active board.
+        // Default board: DEFAULT_BOARD, else the first listed active board.
         path: "/",
         name: "Home",
         component: { render: () => null },
@@ -23,7 +23,8 @@ export function createAppRouter(skin: Skin): Router {
             const configured = getConfig().defaultBoard;
             const board =
               boards.find((b) => b.name === configured) ||
-              boards.find((b) => b.isActive) ||
+              boards.find((b) => b.isListed && b.isActive) ||
+              boards.find((b) => b.isListed) ||
               boards[0];
             if (board) return `/${board.name}`;
             store.setError(t("error.noBoards"));
@@ -37,6 +38,11 @@ export function createAppRouter(skin: Skin): Router {
         path: "/auth",
         name: "Auth",
         component: () => import("@/pages/AuthCallback.vue"),
+      },
+      {
+        path: "/admin",
+        name: "Admin",
+        component: () => import("@/pages/admin/AdminPage.vue"),
       },
       {
         path: "/:boardName",
@@ -61,6 +67,9 @@ export function createAppRouter(skin: Skin): Router {
       }
       if (typeof to.params.boardName === "string") {
         jobs.push(store.fetchBoard(to.params.boardName));
+      } else {
+        store.clearBoard();
+        store.canWrite = false;
       }
       await Promise.all(jobs);
     } catch (error) {

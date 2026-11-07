@@ -1,7 +1,7 @@
 import { computed, ref, watch } from "vue";
 import { DateTime } from "luxon";
 import { decode } from "html-entities";
-import { getTopics } from "@/api";
+import { getTopics, permits } from "@/api";
 import type { Topic } from "@/api";
 import { t } from "@/i18n";
 import { useAppStore } from "@/stores/app";
@@ -28,7 +28,10 @@ export function useTopicList() {
   });
 
   function updateCanWrite(): void {
-    store.canWrite = store.board.isActive && !store.user.isBlocked;
+    store.canWrite =
+      store.board.isActive &&
+      !store.user.isBlocked &&
+      permits(store.board.writePermission, store.user);
   }
 
   // The router guard loads the board before the route changes, so the board
@@ -43,7 +46,11 @@ export function useTopicList() {
     },
     { immediate: true },
   );
-  watch(() => store.user.isBlocked, updateCanWrite);
+  watch(
+    () => [store.user, store.board.isActive, store.board.writePermission],
+    updateCanWrite,
+    { deep: true },
+  );
 
   return {
     topics,

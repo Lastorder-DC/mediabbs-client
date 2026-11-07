@@ -9,6 +9,7 @@ import { availableLocales, currentLocale, setLocale } from "@/i18n";
 import type { LocaleCode } from "@/i18n";
 import { availableSkins, currentSkinName, setSkin } from "@/skins";
 import { useMenu } from "@/composables/useMenu";
+import { boardIconClass } from "@/menu";
 import SimpleMenu from "./SimpleMenu.vue";
 import { defaultMenu } from "./menu";
 
@@ -51,6 +52,7 @@ useHead({
             {{ t("nav.login") }}
           </button>
           <template v-else>
+            <RouterLink v-if="user.isAdmin" to="/admin">{{ t("admin.page") }}</RouterLink>
             <a :href="session.userPage(user.username)">{{ user.username }}</a>
             <button class="s-button" @click="session.logout">{{ t("nav.logout") }}</button>
           </template>
@@ -60,7 +62,9 @@ useHead({
     <main class="s-wrap s-main">
       <div class="s-title-row">
         <h1 v-if="board.name">
-          <RouterLink :to="`/${board.name}`">{{ board.displayName }}</RouterLink>
+          <RouterLink :to="`/${board.name}`">
+            <i v-if="board.icon" :class="boardIconClass(board.icon)" class="s-title-icon" aria-hidden="true" />{{ board.displayName }}
+          </RouterLink>
         </h1>
       </div>
       <div v-if="store.error" class="s-card s-error">{{ store.error }}</div>
@@ -139,6 +143,9 @@ useHead({
 .simple-app .s-title-row h1 {
   margin: 0 0 0.8rem;
   font-size: 1.4rem;
+}
+.simple-app .s-title-icon {
+  margin-right: 0.45rem;
 }
 .simple-app .s-title-row h1 a {
   color: var(--text);

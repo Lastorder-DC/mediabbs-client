@@ -1,5 +1,6 @@
-// Navigation menus. Each skin has a default menu (Skin.menu); deployments can
-// replace it per skin with config.js `menus` (see README / docs/skins.md):
+// Navigation menus. Each skin has a default menu (Skin.menu). It can be replaced
+// per skin from the admin page (stored on the server), or with config.js `menus`
+// (see README / docs/skins.md). Admin page first, then config.js, then the skin:
 //
 //   menus: {
 //     simple: [{ type: "boards" }, { type: "wiki" }],
@@ -42,11 +43,19 @@ export interface CustomMenuItem {
 
 export type MenuItemConfig = BuiltinMenuItem | CustomMenuItem;
 
+/** Menus per skin name, or `default` for every skin without its own. */
+export type MenuConfigs = Record<string, MenuItemConfig[]>;
+
 /** A resolved link: `to` for board routes, `href` for everything else. */
 export interface MenuLink {
   key: string;
   label: string;
+  /** Font Awesome icon name (top-level entries). */
   icon?: string;
+  /** CSS classes of an icon shown before the label (board icons: `bi bi-…`). */
+  iconClass?: string;
+  /** Draw a separator above this link (dropdown items). */
+  separator?: boolean;
   to?: string;
   href?: string;
 }
@@ -59,6 +68,19 @@ export interface MenuEntry extends MenuLink {
 export function isBuiltin(item: MenuItemConfig): item is BuiltinMenuItem {
   return typeof (item as BuiltinMenuItem).type === "string";
 }
+
+export const BUILTIN_TYPES: BuiltinMenuType[] = [
+  "recentChanges",
+  "random",
+  "boards",
+  "tools",
+  "wiki",
+  "navLinks",
+];
+
+/** CSS classes for a board's Bootstrap icon. */
+export const boardIconClass = (icon: string | null | undefined): string | undefined =>
+  icon ? `bi bi-${icon}` : undefined;
 
 export const BUILTIN_ICONS: Record<BuiltinMenuType, string | undefined> = {
   recentChanges: "sync",

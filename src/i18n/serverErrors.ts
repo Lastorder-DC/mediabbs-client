@@ -14,4 +14,11 @@ export const SERVER_ERROR_KEYS: Record<string, string> = {
   "File is too large": "fileTooLarge",
   "Uploads are disabled": "uploadsDisabled",
   "File content does not match its extension": "fileMismatch",
+  "Admin only": "adminOnly",
+  "Board name is taken": "boardNameTaken",
+  "Board has topics": "boardHasTopics",
+  "Invalid board name": "invalidBoardName",
+  "Invalid display name": "invalidDisplayName",
+  "Invalid icon name": "invalidIcon",
+  "Every board must be listed once": "boardOrderMismatch",
 };

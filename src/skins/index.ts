@@ -4,8 +4,16 @@ import { runtimeConfig } from "@/config";
 import type { Skin, SkinEntry } from "./types";
 
 export const SKINS: Record<string, SkinEntry> = {
-  liberty: { label: "Liberty", load: () => import("./liberty") },
-  simple: { label: "Simple", load: () => import("./simple") },
+  liberty: {
+    label: "Liberty",
+    load: () => import("./liberty"),
+    menu: () => import("./liberty/menu").then((m) => m.defaultMenu),
+  },
+  simple: {
+    label: "Simple",
+    load: () => import("./simple"),
+    menu: () => import("./simple/menu").then((m) => m.defaultMenu),
+  },
 };
 
 const STORAGE_KEY = "mediabbs.skin";
