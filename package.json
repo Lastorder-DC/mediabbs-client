@@ -15,14 +15,23 @@
   "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7",
-    "@toast-ui/editor": "^3",
+    "@tiptap/core": "^3",
+    "@tiptap/extension-image": "^3",
+    "@tiptap/extension-list": "^3",
+    "@tiptap/extension-table": "^3",
+    "@tiptap/extensions": "^3",
+    "@tiptap/markdown": "^3",
+    "@tiptap/pm": "^3",
+    "@tiptap/starter-kit": "^3",
     "@unhead/vue": "^3",
     "axios": "^1",
     "bootstrap-icons": "^1",
     "buefy": "^3",
     "bulma": "^1",
+    "dompurify": "^3.4.17",
     "html-entities": "^2",
     "luxon": "^3",
+    "marked": "^18",
     "pinia": "^4",
     "vue": "^3.5",
     "vue-i18n": "^11",
@@ -46,8 +55,5 @@
     "vue-eslint-parser": "^10.4.2",
     "vue-tsc": "^3",
     "workbox-window": "^7"
-  },
-  "resolutions": {
-    "dompurify": "^3.4.17"
   }
 }

@@ -241,3 +241,7 @@ contrib/librewiki/  리브레 위키 전용 자산
 
 MIT. 원본 librebbs-client의 저작권 표기(Copyright (c) 2021 Librewiki Developers)를 따릅니다.
 [LICENSE](LICENSE)를 보세요.
+
+편집기는 [Tiptap](https://tiptap.dev)(MIT), 본문 표시는 [marked](https://marked.js.org)(MIT)와
+[DOMPurify](https://github.com/cure53/DOMPurify)(Apache-2.0 또는 MPL-2.0 중 선택)를 씁니다. 모두 MIT
+프로젝트에 넣어 배포할 수 있는 라이선스입니다. 의존성을 추가할 때도 GPL 계열은 피해 주세요.

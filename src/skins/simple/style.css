@@ -67,6 +67,6 @@ select {
 .s-compose > * {
   min-width: 0;
 }
-.s-compose .toastui-editor-defaultUI {
+.s-compose .mb-editor {
   width: 100%;
 }

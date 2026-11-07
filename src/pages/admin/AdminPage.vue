@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Board administration: boards (settings, order) and navigation menus.
+// Board administration: boards (settings, order), navigation menus and the log.
 // Skin-independent: plain markup with its own styles (admin.css).
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -8,12 +8,14 @@ import { useAppStore } from "@/stores/app";
 import { useSession } from "@/composables/useSession";
 import BoardAdmin from "./BoardAdmin.vue";
 import MenuAdmin from "./MenuAdmin.vue";
+import LogAdmin from "./LogAdmin.vue";
 import "./admin.css";
 
 const { t } = useI18n();
 const store = useAppStore();
 const session = useSession();
-const tab = ref<"boards" | "menus">("boards");
+const TABS = ["boards", "menus", "logs"] as const;
+const tab = ref<(typeof TABS)[number]>("boards");
 useHead({ title: () => t("admin.page") });
 </script>
 
@@ -29,28 +31,21 @@ useHead({ title: () => t("admin.page") });
       <template v-else>
         <div class="mb-tabs" role="tablist">
           <button
+            v-for="name in TABS"
+            :key="name"
             type="button"
             role="tab"
             class="mb-tab"
-            :class="{ active: tab === 'boards' }"
-            :aria-selected="tab === 'boards'"
-            @click="tab = 'boards'"
+            :class="{ active: tab === name }"
+            :aria-selected="tab === name"
+            @click="tab = name"
           >
-            {{ t("admin.boards") }}
-          </button>
-          <button
-            type="button"
-            role="tab"
-            class="mb-tab"
-            :class="{ active: tab === 'menus' }"
-            :aria-selected="tab === 'menus'"
-            @click="tab = 'menus'"
-          >
-            {{ t("admin.menus") }}
+            {{ t(`admin.${name}`) }}
           </button>
         </div>
         <BoardAdmin v-if="tab === 'boards'" />
-        <MenuAdmin v-else />
+        <MenuAdmin v-else-if="tab === 'menus'" />
+        <LogAdmin v-else />
       </template>
     </template>
   </div>

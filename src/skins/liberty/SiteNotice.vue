@@ -18,23 +18,24 @@ const { html, fixLinks } = useSiteNotice();
   border-radius: 0.25rem;
   text-align: center;
 }
-.liberty-notice .toastui-editor-contents {
+.liberty-notice .md-content {
   font-size: 1rem;
+  text-align: inherit;
   color: rgb(49, 112, 143);
   word-break: keep-all;
 }
-.liberty-notice .toastui-editor-contents p,
-.liberty-notice .toastui-editor-contents ul,
-.liberty-notice .toastui-editor-contents ol {
+.liberty-notice .md-content p,
+.liberty-notice .md-content ul,
+.liberty-notice .md-content ol {
   margin: 0;
   padding: 0;
   color: rgb(49, 112, 143);
 }
-.liberty-notice .toastui-editor-contents ul {
+.liberty-notice .md-content ul {
   list-style: none;
   line-height: 1.8rem;
 }
-.liberty-notice .toastui-editor-contents ul > li::before {
+.liberty-notice .md-content ul > li::before {
   content: none;
 }
 </style>

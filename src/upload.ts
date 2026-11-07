@@ -21,7 +21,7 @@ function formatBytes(bytes: number): string {
 }
 
 /**
- * TOAST UI `addImageBlobHook`. When uploads are disabled, pasted/dropped images
+ * Uploads an image from the editor and calls `callback` with its URL. When uploads are disabled, pasted/dropped images
  * are rejected instead of being embedded as huge data URLs.
  */
 export async function uploadImage(

@@ -219,3 +219,51 @@ export async function reorderBoards(ids: number[]): Promise<Board[]> {
 export async function saveMenus(menus: MenuConfigs | null): Promise<void> {
   await client.put("/admin/menus", { menus });
 }
+
+export const LOG_TYPES = [
+  "close_topic",
+  "unclose_topic",
+  "hide_topic",
+  "unhide_topic",
+  "suspend_topic",
+  "unsuspend_topic",
+  "pin_topic",
+  "unpin_topic",
+  "hide_comment",
+  "unhide_comment",
+  "create_board",
+  "update_board",
+  "delete_board",
+  "reorder_boards",
+  "update_menus",
+] as const;
+export type LogType = (typeof LOG_TYPES)[number];
+
+/** A moderation/administration log entry (`GET /admin/logs`). */
+export interface LogEntry {
+  id: number;
+  type: LogType | "unknown";
+  /** The topic, comment or board id (0 when there is none). */
+  target: number;
+  userId: number | null;
+  userName: string | null;
+  createdAt: string;
+  topicId: number | null;
+  topicTitle: string | null;
+  boardName: string | null;
+  boardDisplayName: string | null;
+}
+
+/** Newest first; pass the last id as `before` for the next page. */
+export async function getLogs(params: {
+  before?: number;
+  types?: LogType[];
+  limit?: number;
+}): Promise<{ logs: LogEntry[]; hasMore: boolean }> {
+  const query = {
+    before: params.before,
+    limit: params.limit,
+    types: params.types?.length ? params.types.join(",") : undefined,
+  };
+  return (await client.get<{ logs: LogEntry[]; hasMore: boolean }>("/admin/logs", { params: query })).data;
+}

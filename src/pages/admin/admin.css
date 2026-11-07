@@ -312,3 +312,42 @@
 .mb-admin .mb-menu-add select {
   width: auto;
 }
+/* Log */
+.mb-admin .mb-log-filter {
+  width: auto;
+  margin-left: 0.4rem;
+}
+.mb-admin .mb-log-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px solid var(--mb-border);
+}
+.mb-admin .mb-log-time {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+.mb-admin .mb-log-user {
+  font-weight: 600;
+}
+.mb-admin .mb-log-target {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.mb-admin .mb-log-action[class*="log-un"] {
+  background: var(--mb-surface);
+}
+.mb-admin .mb-log-action.log-delete_board,
+.mb-admin .mb-log-action.log-hide_topic,
+.mb-admin .mb-log-action.log-hide_comment,
+.mb-admin .mb-log-action.log-suspend_topic {
+  color: var(--mb-danger);
+  border-color: currentColor;
+}
+.mb-admin .mb-log-more {
+  margin-top: 0.8rem;
+  text-align: center;
+}

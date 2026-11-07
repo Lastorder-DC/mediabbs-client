@@ -79,9 +79,11 @@ interface Skin {
 
 공용 컴포넌트:
 
-- `MarkdownEditor` — TOAST UI 편집기. 이미지 업로드 처리 포함. `ref`로 `getMarkdown()`, `setMarkdown()`,
+- `MarkdownEditor` — 위지윅 편집기([Tiptap](https://tiptap.dev), 결과는 Markdown). 도구 모음, 이미지 업로드
+  (버튼·붙여넣기·끌어 놓기), 마크다운 원문 모드 포함. `ref`로 `getMarkdown()`, `setMarkdown()`,
   `reset()`을 부릅니다. 무거우므로 `defineAsyncComponent`로 불러오는 것을 권장합니다.
-- `MarkdownViewer` — 의견 본문 표시 (HTML은 정리됨).
+- `MarkdownViewer` — 의견 본문 표시 (GFM, 줄바꿈 하나도 줄바꿈으로 표시, HTML은 DOMPurify로 정리).
+  편집기와 같은 본문 스타일(`.md-content`)을 씁니다.
 - `GravatarImage` — 사용자 아바타.
 
 공용 상태(`useAppStore()`)에서 자주 쓰는 것:
