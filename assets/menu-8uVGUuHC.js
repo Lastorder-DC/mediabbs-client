@@ -1,0 +1,1 @@
+var e=[{type:`recentChanges`},{type:`random`},{type:`boards`},{type:`tools`},{type:`navLinks`}];export{e as defaultMenu};

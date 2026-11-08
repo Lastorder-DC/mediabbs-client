@@ -1,0 +1,1 @@
+var e=[{type:`boards`},{type:`wiki`},{type:`recentChanges`},{type:`navLinks`}];export{e as defaultMenu};
