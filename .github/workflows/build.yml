@@ -10,6 +10,8 @@ jobs:
   build:
     name: Lint and build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # push to gh-pages
     steps:
       - uses: actions/checkout@v4
 
@@ -35,14 +37,33 @@ jobs:
 
       - name: Write runtime config.js
         if: ${{ vars.BACKEND_HOST != '' }}
+        env:
+          BACKEND_HOST: ${{ vars.BACKEND_HOST }}
+          SKIN: ${{ vars.SKIN }}
+          SKINS: ${{ vars.SKINS }}
+          MENUS: ${{ vars.MENUS }}
+          PRIMARY_COLOR: ${{ vars.PRIMARY_COLOR }}
+        # Same settings as the Docker image's environment variables.
         run: |
-          printf 'window.MEDIABBS_CONFIG = { backendHost: "%s" };\n' "${{ vars.BACKEND_HOST }}" > dist/config.js
+          # shellcheck disable=SC2016
+          node -e '
+            const e = process.env, config = { backendHost: e.BACKEND_HOST };
+            if (e.SKIN) config.skin = e.SKIN;
+            if (e.SKINS) config.skins = e.SKINS.split(",").map((s) => s.trim()).filter(Boolean);
+            if (e.MENUS) config.menus = JSON.parse(e.MENUS);
+            if (e.PRIMARY_COLOR) config.primaryColor = e.PRIMARY_COLOR;
+            const json = JSON.stringify(config, null, 2).replace(/</g, "\\u003c");
+            require("fs").writeFileSync("dist/config.js", `window.MEDIABBS_CONFIG = ${json};\n`);
+          '
+          cat dist/config.js
 
       # GitHub Pages deployment is opt-in: set the repository variable
       # DEPLOY_GH_PAGES=true (and optionally PAGES_CNAME=bbs.example.org).
       - name: Add CNAME
         if: ${{ github.event_name == 'push' && vars.DEPLOY_GH_PAGES == 'true' && vars.PAGES_CNAME != '' }}
-        run: echo "${{ vars.PAGES_CNAME }}" > dist/CNAME
+        env:
+          PAGES_CNAME: ${{ vars.PAGES_CNAME }}
+        run: printf '%s\n' "$PAGES_CNAME" > dist/CNAME
 
       - name: Deploy to GitHub Pages
         if: ${{ github.event_name == 'push' && vars.DEPLOY_GH_PAGES == 'true' }}

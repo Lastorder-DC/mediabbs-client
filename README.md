@@ -98,6 +98,7 @@ nginx 기반 이미지이며, 컨테이너가 시작할 때 환경 변수로 `co
 |---|---|
 | `DEPLOY_GH_PAGES` | `true`면 배포 |
 | `BACKEND_HOST` | 백엔드 주소. `config.js`에 기록됨 |
+| `SKIN`, `SKINS`, `MENUS` | (선택) `config.js`에 기록되는 기본 스킨, 고를 수 있는 스킨(쉼표 구분), 스킨별 메뉴(JSON). Docker의 같은 이름 환경 변수와 같음 |
 | `PAGES_CNAME` | (선택) 사용자 도메인. 예: `bbs.example.org` |
 | `PRIMARY_COLOR`, `SITE_NAME`, `DEFAULT_SKIN` | (선택) 빌드 시 기본값. 아래 "설정" 참고 |
 
