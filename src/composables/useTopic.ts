@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { DateTime } from "luxon";
 import { decode } from "html-entities";
 import {
@@ -32,15 +32,17 @@ const POLL_MS = 10_000;
 export function useTopic() {
   const store = useAppStore();
   const route = useRoute();
-  const router = useRouter();
   const topic = ref<Topic | null>(null);
   const comments = ref<Comment[]>([]);
   const topicId = computed(() => Number(route.params.topicId));
   let pollTimer: number | undefined;
+  let unmounted = false;
+  /** Board administrators can open hidden topics (to unhide them). */
+  const showHidden = () => store.user.isAdmin;
 
   const scroll = useInfiniteScroll(async (isCurrent) => {
     const id = topicId.value;
-    const page = await getComments(id, comments.value.length, PAGE_SIZE);
+    const page = await getComments(id, comments.value.length, PAGE_SIZE, showHidden());
     if (!isCurrent() || id !== topicId.value) return true;
     appendUnique(comments.value, page);
     const more = page.length === PAGE_SIZE;
@@ -55,6 +57,7 @@ export function useTopic() {
 
   const writeBlockReason = computed((): string | null => {
     if (!topic.value) return null;
+    if (topic.value.isHidden) return t("topic.hiddenNotice");
     if (topic.value.isClosed) return t("topic.closedNotice");
     if (topic.value.isSuspended) return t("topic.suspendedNotice");
     if (!store.board.isActive) return t("topic.archivedNotice");
@@ -109,10 +112,16 @@ export function useTopic() {
   });
 
   async function fetchTopic(): Promise<void> {
+    const id = topicId.value;
     try {
-      topic.value = await getTopic(topicId.value);
-      markVisited(topicId.value);
+      const fresh = await getTopic(id, showHidden());
+      if (unmounted || id !== topicId.value) return;
+      topic.value = fresh;
+      markVisited(id);
     } catch (error) {
+      // The page was left meanwhile (e.g. Back while this was loading): the
+      // error is about a page no longer shown.
+      if (unmounted || id !== topicId.value) return;
       store.setError(errorMessage(error));
     }
   }
@@ -133,7 +142,7 @@ export function useTopic() {
   async function loadNewComments(): Promise<void> {
     const id = topicId.value;
     for (;;) {
-      const page = await getComments(id, comments.value.length, PAGE_SIZE);
+      const page = await getComments(id, comments.value.length, PAGE_SIZE, showHidden());
       if (id !== topicId.value) return;
       appendUnique(comments.value, page);
       if (page.length < PAGE_SIZE) return;
@@ -143,7 +152,6 @@ export function useTopic() {
   async function moderate(status: TopicStatus): Promise<void> {
     try {
       topic.value = await setTopicStatus(topicId.value, status);
-      if (status.isHidden) router.push(`/${store.board.name}`);
     } catch (error) {
       store.showModalError(errorMessage(error));
     }
@@ -171,6 +179,7 @@ export function useTopic() {
   }
   commentSubmitter.value = submitComment;
   onBeforeUnmount(() => {
+    unmounted = true;
     window.clearTimeout(pollTimer);
     if (commentSubmitter.value === submitComment) commentSubmitter.value = null;
   });

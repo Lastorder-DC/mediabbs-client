@@ -14,7 +14,7 @@ useHead({ title: () => board.value.displayName });
   <div class="page-topic-list">
     <ul>
       <li v-for="topic in topics" :key="topic.id">
-        <RouterLink :to="list.topicPath(topic)" class="topic-card card">
+        <RouterLink :to="list.topicPath(topic)" class="topic-card card" :class="{ 'is-hidden-topic': topic.isHidden }">
           <div class="topic-card-header">
             <span class="topic-author">
               <a :href="userUrl(topic.authorName)" @click.stop>{{ topic.authorName }}</a>
@@ -33,6 +33,9 @@ useHead({ title: () => board.value.displayName });
             <div class="topic-icons">
               <b-tooltip v-if="list.isUpdatedSinceVisit(topic)" :label="t('topic.updatedSinceVisit')">
                 <b-icon icon="exclamation" />
+              </b-tooltip>
+              <b-tooltip v-if="topic.isHidden" :label="t('topic.hidden')">
+                <b-icon icon="eye-slash" />
               </b-tooltip>
               <b-tooltip v-if="topic.isClosed" :label="t('topic.closed')">
                 <b-icon icon="lock" />
@@ -75,6 +78,14 @@ useHead({ title: () => board.value.displayName });
 }
 .page-topic-list .topic-card-body {
   color: #4a4a4a;
+}
+/* Hidden topics: only board administrators get them, to unhide them. */
+.page-topic-list .topic-card.is-hidden-topic {
+  background: #f0f0f0;
+  opacity: 0.7;
+}
+.page-topic-list .is-hidden-topic .topic-title {
+  text-decoration: line-through;
 }
 .page-topic-list .topic-comment-count {
   margin-left: 0.2rem;

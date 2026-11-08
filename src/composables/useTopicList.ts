@@ -20,7 +20,8 @@ export function useTopicList() {
   const scroll = useInfiniteScroll(async (isCurrent) => {
     if (!board.value.id) return false;
     const boardId = board.value.id;
-    const page = await getTopics(boardId, topics.value.length, PAGE_SIZE);
+    // Board administrators also see hidden topics (marked in the list).
+    const page = await getTopics(boardId, topics.value.length, PAGE_SIZE, store.user.isAdmin);
     // A reset (board change) happened while loading: drop this page.
     if (!isCurrent() || boardId !== board.value.id) return true;
     appendUnique(topics.value, page);
@@ -38,7 +39,7 @@ export function useTopicList() {
   // id is the one thing that identifies the list (watching the route param as
   // well would reset the list twice per navigation).
   watch(
-    () => store.board.id,
+    () => [store.board.id, store.user.isAdmin],
     () => {
       topics.value = [];
       updateCanWrite();

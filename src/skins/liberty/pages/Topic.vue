@@ -16,7 +16,7 @@ useHead({ title: () => (title.value ? `${title.value} - ${store.board.displayNam
   <div v-if="topic" class="page-topic">
     <div class="topic-heading box">
       <RouterLink :to="topicPath">
-        <h3 class="title topic-title">{{ title }}</h3>
+        <h3 class="title topic-title" :class="{ 'is-hidden-topic': topic.isHidden }">{{ title }}</h3>
       </RouterLink>
       <b-dropdown v-if="store.user.isAdmin" class="admin-tools" position="is-bottom-left">
         <template #trigger>
@@ -62,6 +62,10 @@ useHead({ title: () => (title.value ? `${title.value} - ${store.board.displayNam
   justify-content: space-between;
   align-items: center;
   min-height: 2rem;
+}
+.page-topic .topic-title.is-hidden-topic {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 .page-topic .topic-title {
   font-size: 1.5rem;

@@ -38,7 +38,7 @@ async function submit(): Promise<void> {
 <template>
   <div v-if="topic" class="simple-topic">
     <div class="s-topic-head">
-      <h2>{{ title }}</h2>
+      <h2 :class="{ 's-hidden-topic': topic.isHidden }">{{ title }}</h2>
       <div v-if="store.user.isAdmin" class="s-admin">
         <button class="s-button" @click="page.moderate({ isPinned: !topic.isPinned })">
           {{ topic.isPinned ? t("admin.unpin") : t("admin.pin") }}
@@ -92,6 +92,10 @@ async function submit(): Promise<void> {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+}
+.simple-topic .s-topic-head h2.s-hidden-topic {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 .simple-topic .s-topic-head h2 {
   margin: 0 0 0.6rem;

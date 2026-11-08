@@ -42,6 +42,8 @@ export default {
     titlePlaceholder: "제목",
     newComment: "새 의견 추가하기",
     anonymousWarning: "⚠️ 현재 로그인되어 있지 않습니다. 글 작성 시 IP가 노출됩니다.",
+    hidden: "숨겨진 주제",
+    hiddenNotice: "숨겨진 주제입니다. 관리자에게만 보이며 의견을 추가할 수 없습니다.",
     closedNotice: "이 주제는 종료되어 의견을 추가할 수 없습니다.",
     suspendedNotice: "이 주제는 잠겨 있어 의견을 추가할 수 없습니다.",
     archivedNotice: "이 게시판은 보관 중이어서 의견을 추가할 수 없습니다.",

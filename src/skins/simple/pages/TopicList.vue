@@ -47,11 +47,12 @@ async function submit(): Promise<void> {
       <button class="s-button primary" :disabled="busy" @click="submit">{{ t("common.submit") }}</button>
     </div>
     <ul class="s-card s-topics">
-      <li v-for="topic in topics" :key="topic.id">
+      <li v-for="topic in topics" :key="topic.id" :class="{ 's-hidden-topic': topic.isHidden }">
         <RouterLink :to="list.topicPath(topic)" class="s-topic-title">
           <span v-if="topic.isPinned" :title="t('topic.pinned')">📌 </span>
           <span v-if="topic.isClosed || topic.isSuspended" :title="topic.isClosed ? t('topic.closed') : t('topic.suspended')">🔒 </span>
-          {{ list.title(topic) }}
+          <span v-if="topic.isHidden" class="sr-only">{{ t("topic.hidden") }}: </span>
+          <span class="s-topic-text" :title="topic.isHidden ? t('topic.hidden') : undefined">{{ list.title(topic) }}</span>
           <span v-if="topic.commentCount > 1" class="s-muted">[{{ topic.commentCount }}]</span>
           <span v-if="list.isUpdatedSinceVisit(topic)" class="s-dot" :title="t('topic.updatedSinceVisit')" />
         </RouterLink>
@@ -93,6 +94,21 @@ async function submit(): Promise<void> {
 .simple-topic-list .s-topic-title {
   color: var(--text);
   font-weight: 600;
+}
+/* Hidden topics: only board administrators get them, to unhide them. */
+.simple-topic-list .s-topics li.s-hidden-topic {
+  background: rgba(127, 127, 127, 0.12);
+  opacity: 0.7;
+}
+.simple-topic-list .s-hidden-topic .s-topic-text {
+  text-decoration: line-through;
+}
+.simple-topic-list .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 .simple-topic-list .s-dot {
   display: inline-block;

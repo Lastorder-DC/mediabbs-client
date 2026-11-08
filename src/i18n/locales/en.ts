@@ -44,6 +44,8 @@ const en: typeof ko = {
     titlePlaceholder: "Title",
     newComment: "Add a comment",
     anonymousWarning: "⚠️ You are not logged in. Your IP address will be shown with your post.",
+    hidden: "Hidden topic",
+    hiddenNotice: "This topic is hidden: only administrators can see it, and no comments can be added.",
     closedNotice: "This topic is closed; no more comments can be added.",
     suspendedNotice: "This topic is suspended; no more comments can be added.",
     archivedNotice: "This board is archived; no more comments can be added.",

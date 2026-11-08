@@ -135,13 +135,28 @@ export async function getBoardsUncached(): Promise<Board[]> {
   return (await response.json()) as Board[];
 }
 
-export async function getTopics(boardId: number, offset: number, limit: number): Promise<Topic[]> {
-  return (await client.get<Topic[]>(`/boards/${boardId}/topics`, { params: { offset, limit } }))
-    .data;
+/** `showHidden` (board administrators only) adds the parameter; left off, URLs stay cacheable. */
+function hiddenParam(showHidden: boolean): { showHidden?: true } {
+  return showHidden ? { showHidden: true } : {};
 }
 
-export async function getTopic(topicId: number): Promise<Topic> {
-  return (await client.get<Topic>(`/topics/${topicId}`)).data;
+/** `showHidden`: include hidden topics (board administrators only). */
+export async function getTopics(
+  boardId: number,
+  offset: number,
+  limit: number,
+  showHidden = false,
+): Promise<Topic[]> {
+  return (
+    await client.get<Topic[]>(`/boards/${boardId}/topics`, {
+      params: { offset, limit, ...hiddenParam(showHidden) },
+    })
+  ).data;
+}
+
+/** `showHidden`: also when the topic is hidden (board administrators only). */
+export async function getTopic(topicId: number, showHidden = false): Promise<Topic> {
+  return (await client.get<Topic>(`/topics/${topicId}`, { params: hiddenParam(showHidden) })).data;
 }
 
 export async function postTopic(boardId: number, title: string, content: string): Promise<Topic> {
@@ -157,9 +172,12 @@ export async function getComments(
   topicId: number,
   offset: number,
   limit: number,
+  showHidden = false,
 ): Promise<Comment[]> {
   return (
-    await client.get<Comment[]>(`/topics/${topicId}/comments`, { params: { offset, limit } })
+    await client.get<Comment[]>(`/topics/${topicId}/comments`, {
+      params: { offset, limit, ...hiddenParam(showHidden) },
+    })
   ).data;
 }
 
