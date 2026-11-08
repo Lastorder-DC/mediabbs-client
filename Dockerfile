@@ -12,7 +12,7 @@ ARG VITE_PRIMARY_COLOR=
 ARG VITE_SITE_NAME=
 ARG VITE_DEFAULT_SKIN=
 # Commit hash shown in the version ("0.3.0-1a2b3c4"); there is no .git in the
-# image. Leave it out (or empty) for release builds: plain "0.3.0".
+# image. Leave it out (or empty) for release images: plain "0.3.0".
 #   docker build --build-arg MEDIABBS_GIT_HASH=$(git rev-parse --short=7 HEAD) .
 ARG MEDIABBS_GIT_HASH=
 RUN node .yarn/releases/yarn-4.9.1.cjs build

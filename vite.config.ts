@@ -14,20 +14,17 @@ function git(...args: string[]): string | null {
 }
 
 /**
- * "0.4.0-1a2b3c4", or "0.4.0" for a release tag. The hash comes from
- * MEDIABBS_GIT_HASH when set (Docker builds have no .git; empty = release),
- * else from git; no git gives the plain version.
+ * "0.4.0-1a2b3c4", or "0.4.0" for release packages. The hash comes from
+ * MEDIABBS_GIT_HASH when set (Docker builds have no .git; empty = release
+ * image), else from git: a checkout always shows its commit, even on a
+ * release tag. No git (release tarball) gives the plain version.
  */
 function appVersion(): string {
   const { version } = JSON.parse(
     readFileSync(new URL("./package.json", import.meta.url), "utf8"),
   ) as { version: string };
   let hash = process.env.MEDIABBS_GIT_HASH;
-  if (hash === undefined) {
-    hash = git("describe", "--tags", "--exact-match", "HEAD") !== null
-      ? ""
-      : (git("rev-parse", "--short=7", "HEAD") ?? "");
-  }
+  if (hash === undefined) hash = git("rev-parse", "--short=7", "HEAD") ?? "";
   hash = hash.replace(/[^0-9a-zA-Z]/g, "").slice(0, 7);
   return hash ? `${version}-${hash}` : version;
 }
