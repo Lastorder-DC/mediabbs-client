@@ -59,6 +59,12 @@ const en: typeof ko = {
     boards: "Boards",
     menus: "Menus",
     logs: "Log",
+    version: "Version",
+    versionInfo: {
+      backend: "Backend",
+      frontend: "Frontend",
+      loading: "Loading…",
+    },
     log: {
       filter: "Type",
       filters: {

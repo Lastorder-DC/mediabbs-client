@@ -57,6 +57,12 @@ export default {
     boards: "게시판",
     menus: "메뉴",
     logs: "관리 기록",
+    version: "버전",
+    versionInfo: {
+      backend: "백엔드",
+      frontend: "프론트엔드",
+      loading: "불러오는 중…",
+    },
     log: {
       filter: "종류",
       filters: {

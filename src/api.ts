@@ -273,6 +273,11 @@ export interface LogEntry {
 }
 
 /** Newest first; pass the last id as `before` for the next page. */
+/** The backend version (board administrators only). */
+export async function getBackendVersion(): Promise<string> {
+  return (await client.get<{ version: string }>("/admin/version")).data.version;
+}
+
 export async function getLogs(params: {
   before?: number;
   types?: LogType[];

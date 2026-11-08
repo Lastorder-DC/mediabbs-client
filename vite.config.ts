@@ -1,7 +1,36 @@
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { VitePWA } from "vite-plugin-pwa";
+
+function git(...args: string[]): string | null {
+  try {
+    return execFileSync("git", args, { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * "0.3.0-1a2b3c4", or "0.3.0" for a release tag. The hash comes from
+ * MEDIABBS_GIT_HASH when set (Docker builds have no .git; empty = release),
+ * else from git; no git gives the plain version.
+ */
+function appVersion(): string {
+  const { version } = JSON.parse(
+    readFileSync(new URL("./package.json", import.meta.url), "utf8"),
+  ) as { version: string };
+  let hash = process.env.MEDIABBS_GIT_HASH;
+  if (hash === undefined) {
+    hash = git("describe", "--tags", "--exact-match", "HEAD") !== null
+      ? ""
+      : (git("rev-parse", "--short=7", "HEAD") ?? "");
+  }
+  hash = hash.replace(/[^0-9a-zA-Z]/g, "").slice(0, 7);
+  return hash ? `${version}-${hash}` : version;
+}
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -43,6 +72,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __DEFAULT_PRIMARY_COLOR__: JSON.stringify(primaryColor),
+      __APP_VERSION__: JSON.stringify(appVersion()),
     },
     build: {
       chunkSizeWarningLimit: 1500,

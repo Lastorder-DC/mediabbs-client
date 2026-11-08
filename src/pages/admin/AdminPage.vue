@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// Board administration: boards (settings, order), navigation menus and the log.
+// Board administration: boards (settings, order), navigation menus, the log
+// and the running versions.
 // Skin-independent: plain markup with its own styles (admin.css).
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -9,12 +10,13 @@ import { useSession } from "@/composables/useSession";
 import BoardAdmin from "./BoardAdmin.vue";
 import MenuAdmin from "./MenuAdmin.vue";
 import LogAdmin from "./LogAdmin.vue";
+import VersionInfo from "./VersionInfo.vue";
 import "./admin.css";
 
 const { t } = useI18n();
 const store = useAppStore();
 const session = useSession();
-const TABS = ["boards", "menus", "logs"] as const;
+const TABS = ["boards", "menus", "logs", "version"] as const;
 const tab = ref<(typeof TABS)[number]>("boards");
 useHead({ title: () => t("admin.page") });
 </script>
@@ -45,7 +47,8 @@ useHead({ title: () => t("admin.page") });
         </div>
         <BoardAdmin v-if="tab === 'boards'" />
         <MenuAdmin v-else-if="tab === 'menus'" />
-        <LogAdmin v-else />
+        <LogAdmin v-else-if="tab === 'logs'" />
+        <VersionInfo v-else />
       </template>
     </template>
   </div>
