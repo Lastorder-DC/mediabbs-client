@@ -14,7 +14,7 @@ function git(...args: string[]): string | null {
 }
 
 /**
- * "0.3.0-1a2b3c4", or "0.3.0" for a release tag. The hash comes from
+ * "0.4.0-1a2b3c4", or "0.4.0" for a release tag. The hash comes from
  * MEDIABBS_GIT_HASH when set (Docker builds have no .git; empty = release),
  * else from git; no git gives the plain version.
  */

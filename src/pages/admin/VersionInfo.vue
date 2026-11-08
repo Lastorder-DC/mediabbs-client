@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Running versions: "0.3.0-1a2b3c4" (commit), or "0.3.0" for release builds.
+// Running versions: "0.4.0-1a2b3c4" (commit), or "0.4.0" for release builds.
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { errorMessage, getBackendVersion } from "@/api";

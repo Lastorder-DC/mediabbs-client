@@ -74,7 +74,7 @@ docker run -d --name mediabbs-client --restart unless-stopped \
   mediabbs-client
 ```
 
-관리 페이지의 버전 탭에는 `0.3.0-1a2b3c4`처럼 커밋 해시가 붙습니다(릴리즈 태그에서 빌드하면 `0.3.0`). 이미지에는 `.git`이 없으므로 Docker로 빌드할 때는 `--build-arg MEDIABBS_GIT_HASH=$(git rev-parse --short=7 HEAD)`로 넘깁니다. 넘기지 않으면 `0.3.0`만 표시합니다.
+관리 페이지의 버전 탭에는 `0.4.0-1a2b3c4`처럼 커밋 해시가 붙습니다(릴리즈 태그에서 빌드하면 `0.4.0`). 이미지에는 `.git`이 없으므로 Docker로 빌드할 때는 `--build-arg MEDIABBS_GIT_HASH=$(git rev-parse --short=7 HEAD)`로 넘깁니다. 넘기지 않으면 `0.4.0`만 표시합니다.
 
 nginx 기반 이미지이며, 컨테이너가 시작할 때 환경 변수로 `config.js`를 만듭니다. SPA fallback과
 캐시 헤더도 설정돼 있습니다([docker/nginx.conf](docker/nginx.conf)).

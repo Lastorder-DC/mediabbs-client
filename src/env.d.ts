@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 declare const __DEFAULT_PRIMARY_COLOR__: string;
-/** "0.3.0-1a2b3c4", or "0.3.0" for release builds (vite.config.ts). */
+/** "0.4.0-1a2b3c4", or "0.4.0" for release builds (vite.config.ts). */
 declare const __APP_VERSION__: string;
 
 interface ImportMetaEnv {
